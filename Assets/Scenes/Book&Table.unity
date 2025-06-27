@@ -398,7 +398,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1071359958148435772, guid: 0f5e680c07cd9754093df1ce671f4bec, type: 3}
       propertyPath: m_Intensity
-      value: 50
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -1071359958148435772, guid: 0f5e680c07cd9754093df1ce671f4bec, type: 3}
       propertyPath: m_Shadows.m_Type
