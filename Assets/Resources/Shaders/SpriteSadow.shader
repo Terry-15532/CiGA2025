@@ -1,104 +1,114 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Custom/SpriteDiffuse"  
-{  
+Shader "Custom/URP2D/SpriteCastShadow"
+{
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
-
-        _AlphaCutOff ("AlphaCutOff", Range(0,1)) = 0.05
+        _MainTex  ("Sprite Texture", 2D) = "white" {}
+        _Color    ("Tint Color",    Color) = (1,1,1,1)
+        _Cutoff   ("Alpha Cutoff",  Range(0,1)) = 0.1
     }
-
     SubShader
     {
+        Tags
+        {
+            "Queue"="Transparent"
+            "RenderType"="TransparentCutout"
+            "IgnoreProjector"="True"
+        }
+        Cull Off
+        ZWrite On
+        ZTest LEqual
+
+        //———— 阴影投射 Pass ————
         Pass
         {
-            Tags {"LightMode"="ForwardBase"}
-
-            CGPROGRAM
-
+            Name "ShadowCaster"
+            Tags { "LightMode"="ShadowCaster" }
+            Blend Off
+            ZWrite On
+            HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile _ _ALPHATEST_ON
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "AutoLight.cginc"
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            float4 _Color;
+            float _Cutoff;
 
-            sampler2D _MainTex;
-            fixed _AlphaCutOff;
-
-            struct appdata
+            struct Attributes
             {
-                half3 normal : NORMAL;
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD;
-                fixed4 color : COLOR;
+                float3 positionOS: POSITION;
+                float2 uv:         TEXCOORD0;
+            };
+            struct Varyings
+            {
+                float2 uv:         TEXCOORD0;
+                float4 positionCS: SV_POSITION;
             };
 
-            struct v2f
+            Varyings vert(Attributes IN)
             {
-                float2 uv : TEXCOORD;
-                fixed4 color : COLOR;
-                float4 vertex : SV_POSITION;
-            };
-
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                o.color = v.color;
-
-                return o;
+                Varyings OUT;
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS);
+                OUT.uv         = IN.uv;
+                return OUT;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            float frag(Varyings IN) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv) * i.color;
-                clip(col.a - _AlphaCutOff);
-                return col;
+                // 采样贴图并乘以 tint，再做 alpha 裁剪
+                float4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv) * _Color;
+                clip(col.a - _Cutoff);
+                return 0;
             }
-            ENDCG
+            ENDHLSL
         }
 
+        //———— 正常透明渲染 Pass ————
         Pass
         {
-            Tags {"LightMode"="ShadowCaster"}
+            Name "UniversalForward"
+            Tags { "LightMode"="UniversalForward" }
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite On
 
-            CGPROGRAM
+            HLSLPROGRAM
             #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_shadowcaster
+            #pragma fragment fragBase
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "AutoLight.cginc"
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            float4 _Color;
+            float _Cutoff;
 
-            sampler2D _MainTex;
-            fixed _AlphaCutOff;
-
-            struct v2f { 
-                V2F_SHADOW_CASTER;
-                float4 texcoord : TEXCOORD1;
-                fixed4 color : COLOR;
+            struct Attributes
+            {
+                float3 positionOS: POSITION;
+                float2 uv:         TEXCOORD0;
+            };
+            struct Varyings
+            {
+                float2 uv:         TEXCOORD0;
+                float4 positionCS: SV_POSITION;
             };
 
-            v2f vert(appdata_full v)
+            Varyings vert(Attributes IN)
             {
-                v2f o;
-                o.texcoord = v.texcoord;
-                o.color = v.color;
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                return o;
+                Varyings OUT;
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS);
+                OUT.uv         = IN.uv;
+                return OUT;
             }
 
-            float4 frag(v2f i) : SV_Target
+            half4 fragBase(Varyings IN) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.texcoord) * i.color;
-                clip(col.a - _AlphaCutOff);
-                SHADOW_CASTER_FRAGMENT(i)
+                half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                clip(tex.a - _Cutoff);
+                return tex * _Color;
             }
-            ENDCG
+            ENDHLSL
         }
     }
-}  
+}
