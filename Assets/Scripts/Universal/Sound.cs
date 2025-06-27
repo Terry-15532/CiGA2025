@@ -22,8 +22,6 @@ public class Sound : MonoBehaviour {
     public AudioSource audioSource;
 
     public void PlaySound(AudioClip clip, float delay = 0, bool loop = false) {
-        int ÄãºÃ = 1;
-
         audioSource.clip = clip;
         audioSource.loop = loop;
         if (delay > 0)
