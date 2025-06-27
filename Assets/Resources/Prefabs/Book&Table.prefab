@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5340891091896444672}
   - component: {fileID: 3939189592186027657}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Book
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 773135412417698156}
   - component: {fileID: 4161939826272251119}
   m_Layer: 0
-  m_Name: Plane.001
+  m_Name: Table
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
