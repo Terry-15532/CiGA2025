@@ -21,6 +21,11 @@ public class ObjectInteract : MonoBehaviour
     public static int colorID = Shader.PropertyToID("_EdgeColor");
     public static int thresholdID = Shader.PropertyToID("_Threshold");
 
+    public bool railroaded = false;
+    public Vector3 hand_final_pos;
+    public GameObject target_object;
+
+
     // Start is called before the first frame update
     void Start()
     {

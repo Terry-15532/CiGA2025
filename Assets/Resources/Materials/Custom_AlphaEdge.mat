@@ -29,9 +29,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Emission: 2.5
-    - _Threshold: 0.0001
+    - _Emission: 1
+    - _Threshold: 2
     m_Colors:
-    - _EdgeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    - _EdgeColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

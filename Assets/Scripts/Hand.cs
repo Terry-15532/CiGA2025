@@ -11,14 +11,12 @@ public class Hand : MonoBehaviour
     private float yVal, yValHand;
     public bool followMouse = true;
     public bool clickable = false;
+    public bool clickable_railroad = false;
     public bool holding = false;
     public ObjectInteract currObj;
 
     public float duration = 0.75f;
     public float elapsedTime = 0f;
-
-    private bool isFalling = false;
-    private bool isRising = false;
 
     private bool seekMouse = false;
     public float seekStrength = 10f;
@@ -28,6 +26,16 @@ public class Hand : MonoBehaviour
     public static int colorID = Shader.PropertyToID("_EdgeColor");
     public static int thresholdID = Shader.PropertyToID("_Threshold");
 
+    public bool isFalling = false;
+    public bool isRising = false;
+    public bool isRailroadingDown = false;
+    public bool isRailroadingUp = false;
+
+    public bool railroaded = false;
+    public bool railroaddown = false;
+    public Vector3 hand_final_pos;
+    public GameObject target_object;
+    public Vector3 startPos;
 
     private void Start()
     {
@@ -65,14 +73,21 @@ public class Hand : MonoBehaviour
         // Rotate only around X to face the camera
         //FaceCameraOnXAxisOnly();
 
-        if (clickable && !holding && !isFalling && !isRising && Input.GetMouseButtonDown(0))
+        if (clickable_railroad && railroaded && holding && !isFalling && !isRising && !isRailroadingDown && !isRailroadingUp && Input.GetMouseButtonDown(0))
+        {
+            followMouse = false;
+            elapsedTime = 0f;
+            startPos = transform.Find("Hand").position;
+            isRailroadingDown = true;
+        }
+        else if (clickable && !holding && !isFalling && !isRising && !isRailroadingDown && !isRailroadingUp && Input.GetMouseButtonDown(0))
         {
             followMouse = false;
             elapsedTime = 0f;
             isFalling = true;
 
         }
-        else if(holding && !isFalling && !isRising && Input.GetMouseButtonDown(0))
+        else if(holding && !isFalling && !isRising && !isRailroadingDown && !isRailroadingUp && Input.GetMouseButtonDown(0))
         {
             followMouse = false;
             elapsedTime = 0f;
@@ -125,7 +140,40 @@ public class Hand : MonoBehaviour
                 seekMouse = true;
             }
         }
+        else if (isRailroadingDown)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
 
+            // Smooth easing (ease-in, ease-out)
+            float easedT = Mathf.SmoothStep(0f, 1f, t);
+
+            transform.Find("Hand").position = Vector3.Lerp(startPos, hand_final_pos, easedT);
+
+            if (t >= 1f)
+            {
+                isRailroadingDown = false;
+                railroaddown = true;
+                ReleaseObject();
+            }
+        }
+        else if (isRailroadingUp)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+
+            // Smooth easing (ease-in, ease-out)
+            float easedT = Mathf.SmoothStep(0f, 1f, t);
+
+            transform.Find("Hand").position = Vector3.Lerp(hand_final_pos, startPos, easedT);
+
+            if (t >= 1f)
+            {
+                isRailroadingUp = false;
+                railroaded = false;
+                seekMouse = true;
+            }
+        }
 
     }
 
@@ -201,6 +249,30 @@ public class Hand : MonoBehaviour
         Debug.Log("Exited outer sphere");
     }
 
+    public void OnTriggerEnter(Collider other)
+    {
+        if (railroaded && holding && other.gameObject == target_object)
+        {
+            clickable_railroad = true;
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 2.5f);
+            sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (railroaded && holding && other.gameObject == target_object)
+        {
+            clickable_railroad = false;
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 1);
+            sr.sharedMaterial.SetFloat(thresholdID, 2f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
+        }
+    }
+
     void TakeObject()
     {
         if (currObj != null)
@@ -211,6 +283,12 @@ public class Hand : MonoBehaviour
             currObj.transform.localPosition = currObj.offset;
             holding = true;
             transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 5;
+            if (currObj.railroaded)
+            {
+                railroaded = true;
+                hand_final_pos = currObj.hand_final_pos;
+                target_object = currObj.target_object;
+            }
         }
         elapsedTime = 0f;
         isRising = true;
@@ -226,8 +304,19 @@ public class Hand : MonoBehaviour
             holding = false;
             transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
         }
-        elapsedTime = 0f;
-        isRising = true;
+
+        if (!railroaddown)
+        {
+            elapsedTime = 0f;
+            isRising = true;
+        }
+        else
+        {
+            railroaddown = false;
+            elapsedTime = 0f;
+            isRailroadingUp = true;
+        }
+
     }
 
 }
