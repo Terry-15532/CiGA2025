@@ -107,6 +107,32 @@ float Posterize(float t, float steps, float hardness = 1){
     return low + diff * smoothstep(mid - diff * (1 - hardness) / 2, mid + diff * (1 - hardness) / 2, t);
 }
 
+// RGB转HSV函数
+float3 RGBtoHSV(float3 c) {
+    float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    float4 p = c.g < c.b ? float4(c.bg, K.wz) : float4(c.gb, K.xy);
+    float4 q = c.r < p.x ? float4(p.xyw, c.r) : float4(c.r, p.yzx);
+    float d = q.x - min(q.w, q.y);
+    float e = 1e-10;
+    return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+// HSV转RGB函数
+float3 HSVtoRGB(float3 c) {
+    float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    float3 p = abs(frac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);
+}
+
+float3 ApplyPosterizeHSV(float3 color, float steps, float hardness) {
+    float3 hsv = RGBtoHSV(color);
+    // 仅对亮度（Value）分色
+    hsv.z = Posterize(hsv.z, steps, hardness);
+    // hsv.x = Posterize(hsv.x, steps, hardness);
+    return HSVtoRGB(hsv);
+}
+
+
 float3 Overlay(float3 A, float3 B, float opacity){
     return A * (1 - opacity) + B * opacity;
 }

@@ -218,7 +218,9 @@ MonoBehaviour:
   acceleration: 9.81
   maxSpeed: 20
   isFalling: 0
-  offset: {x: 0, y: 0, z: 0}
+  isHeld: 0
+  heldSprite: {fileID: 0}
+  offset: {x: -2.83, y: 2.85, z: 0}
 --- !u!135 &360293869
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -262,7 +264,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: d0a7fc233372632469cf60f976cb232f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1045,7 +1047,6 @@ GameObject:
   - component: {fileID: 1311536105}
   - component: {fileID: 1311536104}
   - component: {fileID: 1311536107}
-  - component: {fileID: 1311536108}
   - component: {fileID: 1311536109}
   m_Layer: 0
   m_Name: Object
@@ -1097,7 +1098,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: d0a7fc233372632469cf60f976cb232f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1118,7 +1119,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7ff0991e11ab17a478299d39678934c1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1160,19 +1161,9 @@ MonoBehaviour:
   acceleration: 9.81
   maxSpeed: 20
   isFalling: 0
-  offset: {x: 0, y: 0, z: 0}
---- !u!114 &1311536108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1311536103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eca3c8832ef0eaf4dbeb0d20bcae2d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  isHeld: 0
+  heldSprite: {fileID: 21300000, guid: c57f8ee9d40c8a743a0db4f34e8b81b4, type: 3}
+  offset: {x: -2.83, y: 2.85, z: 0}
 --- !u!114 &1311536109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1613,7 +1604,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e9a506c8ec893547893614aaded41bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  followMouse: 1
+  clickable: 0
+  holding: 0
+  currObj: {fileID: 0}
   duration: 0.5
+  elapsedTime: 0
   seekStrength: 5
   snapDistance: 0.1
 --- !u!4 &1900306097

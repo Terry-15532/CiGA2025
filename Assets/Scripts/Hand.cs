@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using Unity.VisualScripting;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
@@ -7,13 +9,13 @@ using static UnityEngine.GraphicsBuffer;
 public class Hand : MonoBehaviour
 {
     private float yVal, yValHand;
-    private bool followMouse = true;
-    private bool clickable = false;
-    private bool holding = false;
-    private ObjectInteract currObj;
+    public bool followMouse = true;
+    public bool clickable = false;
+    public bool holding = false;
+    public ObjectInteract currObj;
 
     public float duration = 0.75f;
-    private float elapsedTime = 0f;
+    public float elapsedTime = 0f;
 
     private bool isFalling = false;
     private bool isRising = false;
@@ -21,6 +23,10 @@ public class Hand : MonoBehaviour
     private bool seekMouse = false;
     public float seekStrength = 10f;
     public float snapDistance = 0.1f;
+
+    public static int emissionID = Shader.PropertyToID("_Emission");
+    public static int colorID = Shader.PropertyToID("_EdgeColor");
+    public static int thresholdID = Shader.PropertyToID("_Threshold");
 
 
     private void Start()
@@ -157,11 +163,16 @@ public class Hand : MonoBehaviour
             currObj = obj;
             clickable = true;
         }
+        else if (currObj.GetComponent<SpriteChanger>() != null && currObj.GetComponent<SpriteChanger>().targetObject == obj.gameObject)
+        {
+            Debug.Log("Starting outline");
+            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 2.5f);
+            sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
+        }
     }
-    public void HandEnterOuterSphere()
-    {
-        Debug.Log("Entered outer sphere");
-    }
+
     public void HandExitObjectInteract(ObjectInteract obj)
     {
         Debug.Log("Exited interact sphere " + obj.name);
@@ -170,7 +181,21 @@ public class Hand : MonoBehaviour
             currObj = null;
             clickable = false;
         }
+        else if (currObj.GetComponent<SpriteChanger>() != null && currObj.GetComponent<SpriteChanger>().targetObject == obj.gameObject)
+        {
+            Debug.Log("Stopping outline");
+            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 1);
+            sr.sharedMaterial.SetFloat(thresholdID, 2f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
+        }
     }
+
+    public void HandEnterOuterSphere()
+    {
+        Debug.Log("Entered outer sphere");
+    }
+    
     public void HandExitOuterSphere()
     {
         Debug.Log("Exited outer sphere");
@@ -178,21 +203,29 @@ public class Hand : MonoBehaviour
 
     void TakeObject()
     {
-        currObj.transform.SetParent(transform.Find("Hand"));
-        Vector3 handPos = transform.Find("Hand").position;
-        currObj.transform.localPosition = currObj.offset;
-        holding = true;
-        transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 1;
+        if (currObj != null)
+        {
+            currObj.transform.SetParent(transform.Find("Hand"));
+            currObj.StartHolding();
+            Vector3 handPos = transform.Find("Hand").position;
+            currObj.transform.localPosition = currObj.offset;
+            holding = true;
+            transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 5;
+        }
         elapsedTime = 0f;
         isRising = true;
     }
 
     void ReleaseObject()
     {
-        currObj.transform.SetParent(null);
-        currObj.Release();
-        holding = false;
-        transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 3;
+        if (currObj != null)
+        {
+            currObj.transform.SetParent(null);
+            currObj.StopHolding();
+            currObj.Release();
+            holding = false;
+            transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
+        }
         elapsedTime = 0f;
         isRising = true;
     }

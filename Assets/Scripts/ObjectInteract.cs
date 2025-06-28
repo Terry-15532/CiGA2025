@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
@@ -11,13 +12,24 @@ public class ObjectInteract : MonoBehaviour
     public float maxSpeed = 20f;     // Optional cap on falling speed
     private float currentSpeed = 0f;
     public bool isFalling = false;
+    public bool isHeld = false;
+    public Sprite heldSprite;
+    private Sprite oldSprite;
 
     public Vector3 offset;
+    public static int emissionID = Shader.PropertyToID("_Emission");
+    public static int colorID = Shader.PropertyToID("_EdgeColor");
+    public static int thresholdID = Shader.PropertyToID("_Threshold");
 
     // Start is called before the first frame update
     void Start()
     {
         yVal = transform.position.y;
+        oldSprite = GetComponent<SpriteRenderer>().sprite;
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sharedMaterial.SetFloat(emissionID, 1);
+        sr.sharedMaterial.SetFloat(thresholdID, 2f);
+        sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
     }
 
     // Update is called once per frame
@@ -64,6 +76,24 @@ public class ObjectInteract : MonoBehaviour
     {
         //transform.position = new Vector3(transform.position.x, yVal, transform.position.z);
         isFalling = true;
+    }
+
+    public void StartHolding()
+    {
+        isHeld = true;
+        if (heldSprite != null)
+        {
+            GetComponent<SpriteRenderer>().sprite = heldSprite;
+        }
+    }
+
+    public void StopHolding()
+    {
+        isHeld = false;
+        if (heldSprite != null)
+        {
+            GetComponent<SpriteRenderer>().sprite = oldSprite;
+        }
     }
 
 }

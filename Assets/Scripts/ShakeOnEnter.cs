@@ -7,6 +7,7 @@ public class ShakeOnEnter : MonoBehaviour
 {
     GameObject targetObject;
     public bool isShaking = false;
+    public bool isHeld = false;
     public float shakeAmount = 0.1f;
     public float shakeSpeed = 20f;
 
@@ -17,7 +18,7 @@ public class ShakeOnEnter : MonoBehaviour
     void Start()
     {
         targetObject = GetComponent<SpriteChanger>().targetObject.transform.Find("Outer Sphere").gameObject;
-        originalPosition = transform.localPosition;
+        originalPosition = GetComponent<ObjectInteract>().offset;
     }
 
     // Update is called once per frame
