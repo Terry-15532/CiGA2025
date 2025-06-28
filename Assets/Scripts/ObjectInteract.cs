@@ -21,6 +21,8 @@ public class ObjectInteract : MonoBehaviour
     public static int colorID = Shader.PropertyToID("_EdgeColor");
     public static int thresholdID = Shader.PropertyToID("_Threshold");
 
+    public bool playanim_disable_click = false;
+
     public bool railroaded = false;
     public Vector3 hand_final_pos;
     public GameObject target_object;
@@ -63,7 +65,7 @@ public class ObjectInteract : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Hand"))
+        if (!(playanim_disable_click && GetComponent<SpriteChanger>().aniPlayed) && other.CompareTag("Hand"))
         {
             other.GetComponent<Hand>().HandEnterObjectInteract(this);
         }
@@ -71,7 +73,7 @@ public class ObjectInteract : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Hand"))
+        if (!(playanim_disable_click && GetComponent<SpriteChanger>().aniPlayed) && other.CompareTag("Hand"))
         {
             other.GetComponent<Hand>().HandExitObjectInteract(this);
         }
