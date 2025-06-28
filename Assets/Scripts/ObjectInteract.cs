@@ -12,6 +12,8 @@ public class ObjectInteract : MonoBehaviour
     private float currentSpeed = 0f;
     public bool isFalling = false;
 
+    public Vector3 offset;
+
     // Start is called before the first frame update
     void Start()
     {
