@@ -22,6 +22,8 @@ public class Hand : MonoBehaviour
     public float seekStrength = 10f;
     public float snapDistance = 0.1f;
 
+    public Vector3 objectOffset = new Vector3(0.42f, 9.56f, -0.62f);
+
     private void Start()
     {
         yVal = transform.position.y;
@@ -172,7 +174,7 @@ public class Hand : MonoBehaviour
     {
         currObj.transform.SetParent(transform.Find("Hand"));
         Vector3 handPos = transform.Find("Hand").position;
-        currObj.transform.localPosition = /*new Vector3(handPos.x, handPos.y, handPos.z) +*/ new Vector3(0.42f, 9.56f, -0.62f);
+        currObj.transform.localPosition = /*new Vector3(handPos.x, handPos.y, handPos.z) +*/ objectOffset;
         holding = true;
         transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 1;
         elapsedTime = 0f;
