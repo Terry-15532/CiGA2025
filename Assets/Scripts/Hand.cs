@@ -11,6 +11,7 @@ public class Hand : MonoBehaviour
     private bool clickable = false;
     private bool holding = false;
     private ObjectInteract currObj;
+    private ObjectInteract nextObj;
 
     public float duration = 0.75f;
     private float elapsedTime = 0f;
@@ -59,14 +60,14 @@ public class Hand : MonoBehaviour
         // Rotate only around X to face the camera
         //FaceCameraOnXAxisOnly();
 
-        if (clickable && !holding && !currObj.isFalling && Input.GetMouseButtonDown(0))
+        if (clickable && !holding && !isFalling && !isRising && Input.GetMouseButtonDown(0))
         {
             followMouse = false;
             elapsedTime = 0f;
             isFalling = true;
 
         }
-        else if(holding && Input.GetMouseButtonDown(0))
+        else if(holding && !isFalling && !isRising && Input.GetMouseButtonDown(0))
         {
             followMouse = false;
             elapsedTime = 0f;
@@ -152,8 +153,11 @@ public class Hand : MonoBehaviour
     public void HandEnterObjectInteract(ObjectInteract obj)
     {
         Debug.Log("Entered interact sphere " + obj.name);
-        currObj = obj;
-        clickable = true;
+        if (!holding)
+        {
+            currObj = obj;
+            clickable = true;
+        }
     }
     public void HandEnterOuterSphere()
     {
@@ -162,6 +166,7 @@ public class Hand : MonoBehaviour
     public void HandExitObjectInteract(ObjectInteract obj)
     {
         Debug.Log("Exited interact sphere " + obj.name);
+        currObj = null;
         clickable = false;
     }
     public void HandExitOuterSphere()
