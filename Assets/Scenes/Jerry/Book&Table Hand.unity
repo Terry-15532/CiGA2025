@@ -1045,6 +1045,8 @@ GameObject:
   - component: {fileID: 1311536105}
   - component: {fileID: 1311536104}
   - component: {fileID: 1311536107}
+  - component: {fileID: 1311536108}
+  - component: {fileID: 1311536109}
   m_Layer: 0
   m_Name: Object
   m_TagString: Untagged
@@ -1159,6 +1161,36 @@ MonoBehaviour:
   maxSpeed: 20
   isFalling: 0
   offset: {x: 0, y: 0, z: 0}
+--- !u!114 &1311536108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311536103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eca3c8832ef0eaf4dbeb0d20bcae2d09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1311536109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311536103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49b8c35286be4e1b83f954a9c4693784, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetSprite: {fileID: 0}
+  targetObject: {fileID: 360293867}
+  playAnimation: 0
+  singleAnimation: 1
+  animationDuration: 0.5
+  sprites: []
 --- !u!1 &1504908451
 GameObject:
   m_ObjectHideFlags: 0
@@ -1673,7 +1705,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.1161342
+  m_Radius: 1.736206
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1900306100
 Rigidbody:
