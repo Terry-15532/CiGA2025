@@ -34,11 +34,11 @@ Material:
     - _OverrideBias: 1
     m_Floats:
     - _AlphaCutOff: 0.05
-    - _Cutoff: 0.1
+    - _Cutoff: 0
     - _DepthBias: 0.36
     - _NoiseScale: 500
     - _NormalBias: 0.33
-    - _ShakeSpeed: 5
+    - _ShakeSpeed: 2
     - _ShakeStrength: 0.01
     m_Colors:
     - _Color: {r: 1, g: 0.92392933, b: 0.828841, a: 1}
