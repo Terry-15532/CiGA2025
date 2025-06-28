@@ -12,6 +12,7 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _CAST_SHADOW
   - _OVERRIDE_BIAS
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -29,7 +30,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints:
-    - _CastShadow: 0
+    - _CastShadow: 1
     - _OverrideBias: 1
     m_Floats:
     - _AlphaCutOff: 0.05
@@ -37,6 +38,8 @@ Material:
     - _DepthBias: 0.36
     - _NoiseScale: 500
     - _NormalBias: 0.33
+    - _ShakeSpeed: 5
+    - _ShakeStrength: 0.01
     m_Colors:
     - _Color: {r: 1, g: 0.92392933, b: 0.828841, a: 1}
   m_BuildTextureStacks: []

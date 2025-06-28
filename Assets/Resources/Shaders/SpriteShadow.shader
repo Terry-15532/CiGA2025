@@ -12,6 +12,9 @@ Shader "Custom/URP2D/SpriteCastShadow"
         [Toggle(_OVERRIDE_BIAS)] _OverrideBias ("Override Shadow Bias", Integer) = 0
         _DepthBias ("Depth Bias", Range(-1, 1)) = 0
         _NormalBias ("Normal Bias", Range(-1, 1)) = 0
+        _ShakeStrength ("Shake Strength", Range(0, 0.5)) = 0.1
+        _ShakeSpeed ("Shake Speed", Float) = 2.0
+
     }
     SubShader
     {
@@ -34,39 +37,42 @@ Shader "Custom/URP2D/SpriteCastShadow"
             }
 
             HLSLPROGRAM
-            
-            
-            
-            
-            
-			#pragma shader_feature _CAST_SHADOW
-			#pragma shader_feature _OVERRIDE_BIAS
+            #pragma shader_feature _CAST_SHADOW
+            #pragma shader_feature _OVERRIDE_BIAS
 
-			#include "Packages/com.unity.render-pipelines.unive	rsal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-			#pragma vertex CustomShadowVertex
-			#pragma fragment ShadowPassFragment
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            #include "Assets/Resources/Shaders/Common/CommonShaderMethods.hlsl"
 
-			float _DepthBias, _NormalBias;
-			bool _OverrideBias;
+            #pragma vertex CustomShadowVertex
+            #pragma fragment ShadowPassFragment
 
-			Varyings CustomShadowVertex(Attributes v){
-				#if _CAST_SHADOW
-				#if _OVERRIDE_BIAS
+            float _DepthBias, _NormalBias;
+            bool _OverrideBias;
+            float _ShakeStrength;
+            float _ShakeSpeed;
+
+            Varyings CustomShadowVertex(Attributes v)
+            {
+
+                float yFactor = saturate(v.texcoord.y);
+                float timeNoise = GradientNoise(v.texcoord * 3.0 + _Time * _ShakeSpeed, 0.11);
+                float angle = timeNoise * 6.28318; // [0,1] → [0,2π]
+                float2 offset = float2(cos(angle), sin(angle)) * _ShakeStrength * yFactor;
+
+                v.positionOS.xy += offset;
+
+                #if _CAST_SHADOW
+                #if _OVERRIDE_BIAS
                     _ShadowBias.xy = float2(_DepthBias / -10, _NormalBias / -10);
-				#endif
+                #endif
 				return ShadowPassVertex(v);
-				#else
-				Varyings varyings = ShadowPassVertex(v);
-				varyings.positionCS = float4(-1, -1, -1, -100);
-				return varyings;
-				#endif
-			}
-			
-            
-            
-            
-            
+                #else
+                Varyings varyings = ShadowPassVertex(v);
+                varyings.positionCS = float4(-1, -1, -1, -100);
+                return varyings;
+                #endif
+            }
             ENDHLSL
         }
 
@@ -93,6 +99,9 @@ Shader "Custom/URP2D/SpriteCastShadow"
             SAMPLER (sampler_MainTex);
             float4 _Color;
             float _Cutoff, _NoiseScale;
+            float _ShakeStrength;
+            float _ShakeSpeed;
+
 
             struct Attributes
             {
@@ -111,7 +120,19 @@ Shader "Custom/URP2D/SpriteCastShadow"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS);
+
+                // 原始位置
+                float3 pos = IN.positionOS;
+
+                // 计算扰动：以 uv.y 为权重，叠加噪声和正弦移动
+                float yFactor = saturate(IN.uv.y);
+                float timeNoise = GradientNoise(IN.uv * 3.0 + _Time * _ShakeSpeed, 0.11);
+                float angle = timeNoise * 6.28318; // [0,1] → [0,2π]
+                float2 offset = float2(cos(angle), sin(angle)) * _ShakeStrength * yFactor;
+
+                pos.xy += offset;
+
+                OUT.positionCS = TransformObjectToHClip(pos);
                 OUT.uv = IN.uv;
                 OUT.color = IN.color;
                 return OUT;
