@@ -22,6 +22,7 @@ public class SpriteChanger : MonoBehaviour{
 
     public void OnTriggerEnter(Collider other){
         if (!aniPlayed && other.gameObject == targetObject){
+            GetComponent<ShakeOnEnter>().StopShaking();
             aniPlayed = true;
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
             if (!playAnimation){
