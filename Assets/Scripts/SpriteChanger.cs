@@ -12,12 +12,17 @@ public class SpriteChanger : MonoBehaviour{
     [Header("是否播放动画")]
     public bool playAnimation;
 
+    [Header("是否仅播放一次动画")]
+    public bool singleAnimation = true;
+
+    bool aniPlayed = false;
     public float animationDuration = 0.5f;
     public Sprite[] sprites;
     public Coroutine animationCoroutine;
 
     public void OnTriggerEnter(Collider other){
-        if (other.gameObject == targetObject){
+        if (!aniPlayed && other.gameObject == targetObject){
+            aniPlayed = true;
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
             if (!playAnimation){
                 spriteRenderer.sprite = targetSprite;
