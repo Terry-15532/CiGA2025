@@ -2,9 +2,9 @@ Shader "Custom/URP2D/SpriteCastShadow"
 {
     Properties
     {
-        _MainTex  ("Sprite Texture", 2D) = "white" {}
-        _Color    ("Tint Color",    Color) = (1,1,1,1)
-        _Cutoff   ("Alpha Cutoff",  Range(0,1)) = 0.1
+        _MainTex ("Sprite Texture", 2D) = "white" {}
+        _Color ("Tint Color", Color) = (1,1,1,1)
+        _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.1
     }
     SubShader
     {
@@ -22,7 +22,10 @@ Shader "Custom/URP2D/SpriteCastShadow"
         Pass
         {
             Name "ShadowCaster"
-            Tags { "LightMode"="ShadowCaster" }
+            Tags
+            {
+                "LightMode"="ShadowCaster"
+            }
             Blend Off
             ZWrite On
             HLSLPROGRAM
@@ -39,11 +42,12 @@ Shader "Custom/URP2D/SpriteCastShadow"
             struct Attributes
             {
                 float3 positionOS: POSITION;
-                float2 uv:         TEXCOORD0;
+                float2 uv: TEXCOORD0;
             };
+
             struct Varyings
             {
-                float2 uv:         TEXCOORD0;
+                float2 uv: TEXCOORD0;
                 float4 positionCS: SV_POSITION;
             };
 
@@ -51,7 +55,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
             {
                 Varyings OUT;
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS);
-                OUT.uv         = IN.uv;
+                OUT.uv = IN.uv;
                 return OUT;
             }
 
@@ -69,7 +73,10 @@ Shader "Custom/URP2D/SpriteCastShadow"
         Pass
         {
             Name "UniversalForward"
-            Tags { "LightMode"="UniversalForward" }
+            Tags
+            {
+                "LightMode"="UniversalForward"
+            }
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite On
 
@@ -86,11 +93,12 @@ Shader "Custom/URP2D/SpriteCastShadow"
             struct Attributes
             {
                 float3 positionOS: POSITION;
-                float2 uv:         TEXCOORD0;
+                float2 uv: TEXCOORD0;
             };
+
             struct Varyings
             {
-                float2 uv:         TEXCOORD0;
+                float2 uv: TEXCOORD0;
                 float4 positionCS: SV_POSITION;
             };
 
@@ -98,7 +106,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
             {
                 Varyings OUT;
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS);
-                OUT.uv         = IN.uv;
+                OUT.uv = IN.uv;
                 return OUT;
             }
 
