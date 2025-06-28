@@ -5,7 +5,7 @@ using UnityEngine;
 public class BookManager : MonoBehaviour{
     public static List<BookManager> instances = new List<BookManager>();
     public static BookManager currInstance;
-    public static Transform bookPageLeft, bookPageRight; // 书本左右两页的Transform
+    public static Transform bookPageLeft, bookPageRight, leftParent, rightParent; // 书本左右两页的Transform
     public BookElement[] bookElementsLeft, bookElementsRight; // 书本元素数组
     public int levelIndex;
 
@@ -19,14 +19,15 @@ public class BookManager : MonoBehaviour{
             bookElement.gameObject.SetActive(true);
         }
         Tools.CallDelayed(() => {
+            leftParent.transform.SetParent(bookPageLeft);
+            rightParent.transform.SetParent(bookPageRight);
             foreach (var bookElement in bookElementsRight){
-                bookElement.transform.SetParent(bookPageRight);
                 bookElement.gameObject.SetActive(true);
             }
         }, 0.5f);
         Tools.CallDelayed(() => {
-            transform.SetParent(bookPageLeft.parent);
-            transform.SetParent(bookPageLeft.parent);
+            leftParent.transform.SetParent(bookPageLeft.parent);
+            rightParent.transform.SetParent(bookPageRight.parent);
             Tools.CallDelayed(() => {
                 foreach (var bookElement in bookElementsLeft){
                     bookElement.PopUp();
@@ -35,7 +36,7 @@ public class BookManager : MonoBehaviour{
                     bookElement.PopUp();
                 }
             }, 0.5f);
-        }, 3f);
+        }, 2.45f);
     }
 
 }
