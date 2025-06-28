@@ -30,61 +30,61 @@ Shader "Custom/URP2D/SpriteCastShadow"
         ZTest [_ZTestMode]
 
         Pass
-{
-    Name "ShadowCaster"
-    Tags
-    {
-        // 一定要用 ShadowCaster，URP 会识别它去 shadow map
-        "LightMode" = "ShadowCaster"
-        // AlphaTest 类型的物体在投影时也能走这一 Pass
-        "Queue"    = "AlphaTest"
-        "RenderType" = "TransparentCutout"
-    }
-    Cull Off
-    ZWrite On
-    ColorMask 0      // 不写颜色，只写深度
+        {
+            Name "ShadowCaster"
+            Tags
+            {
+                // 一定要用 ShadowCaster，URP 会识别它去 shadow map
+                "LightMode" = "ShadowCaster"
+                // AlphaTest 类型的物体在投影时也能走这一 Pass
+                "Queue" = "AlphaTest"
+                "RenderType" = "TransparentCutout"
+            }
+            Cull Off
+            ZWrite On
+            ColorMask 0 // 不写颜色，只写深度
 
-    HLSLPROGRAM
-    #pragma vertex VertShadowCaster
-    #pragma fragment FragShadowCaster
+            HLSLPROGRAM
+            #pragma vertex VertShadowCaster
+            #pragma fragment FragShadowCaster
 
-    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-    TEXTURE2D(_MainTex);
-    SAMPLER(sampler_MainTex);
-    float _Cutoff;
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            float _Cutoff;
 
-    struct Attributes
-    {
-        float3 posOS : POSITION;
-        float2 uv    : TEXCOORD0;
-    };
+            struct Attributes
+            {
+                float3 posOS : POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-    struct Varyings
-    {
-        float4 posCS : SV_POSITION;
-        float2 uv    : TEXCOORD0;
-    };
+            struct Varyings
+            {
+                float4 posCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-    Varyings VertShadowCaster(Attributes IN)
-    {
-        Varyings OUT;
-        OUT.posCS = TransformObjectToHClip(IN.posOS);
-        OUT.uv    = IN.uv;
-        return OUT;
-    }
+            Varyings VertShadowCaster(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.posCS = TransformObjectToHClip(IN.posOS);
+                OUT.uv = IN.uv;
+                return OUT;
+            }
 
-    half4 FragShadowCaster(Varyings IN) : SV_Target
-    {
-        // 1. 先用纹理 alpha 做 clip()
-        half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
-        clip(alpha - _Cutoff);
+            half4 FragShadowCaster(Varyings IN) : SV_Target
+            {
+                // 1. 先用纹理 alpha 做 clip()
+                half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
+                clip(alpha - _Cutoff);
 
-        // 2. 不需要输出任何颜色，写深度就行
-        return 0;
-    }
-    ENDHLSL
-}
+                // 2. 不需要输出任何颜色，写深度就行
+                return 0;
+            }
+            ENDHLSL
+        }
 
 
         //———— 正常透明渲染 Pass ————
@@ -181,15 +181,12 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 noise = 1 - lerp(0, 0.3, pow(noise, 2));
 
                 float3 worldPos = IN.positionWS.xyz;
-                int additionalLightCount = GetAdditionalLightsCount();
 
-                float3 accumulatedLighting = float3(0, 0, 0);
-                for (int i = 0; i < additionalLightCount; i++){
-                    Light light = GetAdditionalLight(i, worldPos);
-                    float3 lightDir = normalize(light.direction);
-                    float NdotL = saturate(abs((IN.normalWS, lightDir)));
-                    accumulatedLighting += light.color * NdotL * light.distanceAttenuation * light.shadowAttenuation;
-                }
+                Light light = GetAdditionalLight(0, worldPos);
+                float3 lightDir = normalize(light.direction);
+                float NdotL = saturate(5 * abs(dot(IN.normalWS, lightDir)));
+                float3 finalLight = light.color * NdotL * light.distanceAttenuation * light.shadowAttenuation;
+
 
                 //Additional Light Shadow
                 half4 shadowParams = GetAdditionalLightShadowParams(0);
@@ -197,11 +194,11 @@ Shader "Custom/URP2D/SpriteCastShadow"
 
                 int shadowSliceIndex = shadowParams.w;
                 float4 shadowCoord = mul(_AdditionalLightsWorldToShadow[shadowSliceIndex], float4(IN.positionWS, 1.0));
-                float shadow = SampleShadowmap(TEXTURE2D_ARGS(_AdditionalLightsShadowmapTexture, sampler_LinearClampCompare), shadowCoord, shadowSamplingData, shadowParams, true);
+                float shadow = SampleShadowmap(
+                    TEXTURE2D_ARGS(_AdditionalLightsShadowmapTexture, sampler_LinearClampCompare), shadowCoord, shadowSamplingData, shadowParams, true);
 
-                clip(tex.a - _Cutoff);
                 return half4(
-                    tex.rgb * _Color * noise * IN.color.r * accumulatedLighting * 1.5 * saturate(shadow + 0.2), tex.a * IN.color.a);
+                    tex.rgb * _Color * noise * IN.color.r * finalLight * 1.5 * saturate(shadow + 0.2), tex.a * IN.color.a);
             }
             ENDHLSL
         }

@@ -82,9 +82,10 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
 				return ShadowPassVertex(v);
                 #else
                 Varyings varyings = ShadowPassVertex(v);
-                CustomVaryings v;
-                v.positionCS = float4(-1, -1, -1, -100);
-                return v;
+                CustomVaryings vary;
+                vary.positionCS = float4(-1, -1, -1, -100);
+                vary.uv = v.texcoord;
+                return vary;
                 #endif
             }
 
@@ -197,15 +198,11 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
                 noise = 1 - lerp(0, 0.3, pow(noise, 2));
 
                 float3 worldPos = IN.positionWS.xyz;
-                int additionalLightCount = GetAdditionalLightsCount();
 
-                float3 accumulatedLighting = float3(0, 0, 0);
-                for (int i = 0; i < additionalLightCount; i++){
-                    Light light = GetAdditionalLight(i, worldPos);
-                    float3 lightDir = normalize(light.direction);
-                    float NdotL = saturate(abs((IN.normalWS, lightDir)));
-                    accumulatedLighting += light.color * NdotL * light.distanceAttenuation * light.shadowAttenuation;
-                }
+                Light light = GetAdditionalLight(0, worldPos);
+                float3 lightDir = normalize(light.direction);
+                float NdotL = saturate(5 * abs(dot(IN.normalWS, lightDir)));
+                float3 finalLight = light.color * NdotL * light.distanceAttenuation * light.shadowAttenuation;
 
                 //Additional Light Shadow
                 half4 shadowParams = GetAdditionalLightShadowParams(0);
@@ -215,9 +212,8 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
                 float4 shadowCoord = mul(_AdditionalLightsWorldToShadow[shadowSliceIndex], float4(IN.positionWS, 1.0));
                 float shadow = SampleShadowmap(
                     TEXTURE2D_ARGS(_AdditionalLightsShadowmapTexture, sampler_LinearClampCompare), shadowCoord, shadowSamplingData, shadowParams, true);
-
                 return half4(
-                    tex.rgb * _Color * noise * IN.color.r * accumulatedLighting * 2 * saturate(shadow + 0.4), pow(IN.color.a * tex.a, 0.7));
+                    tex.rgb * _Color * noise * IN.color.r * finalLight * 2 * saturate(shadow + 0.4), pow(IN.color.a * tex.a, 0.7));
             }
             ENDHLSL
         }
