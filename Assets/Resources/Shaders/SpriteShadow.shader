@@ -4,7 +4,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
     {
         _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint Color", Color) = (1,1,1,1)
-        _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.1
+        //        _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.01
         _NoiseScale ("Noise Scale", Float) = 1.0
         [Header(Casting Shadow)]
         [Space(10)]
@@ -15,6 +15,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
         _NormalBias ("Normal Bias", Range(-1, 1)) = 0
         _ShakeStrength ("Shake Strength", Range(0, 0.5)) = 0.1
         _ShakeSpeed ("Shake Speed", Float) = 2.0
+//        _DissolvePercent ("Dissolve Percent", Range(0, 1)) = 0.0
 
     }
     SubShader
@@ -34,9 +35,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
             Name "ShadowCaster"
             Tags
             {
-                // 一定要用 ShadowCaster，URP 会识别它去 shadow map
                 "LightMode" = "ShadowCaster"
-                // AlphaTest 类型的物体在投影时也能走这一 Pass
                 "Queue" = "AlphaTest"
                 "RenderType" = "TransparentCutout"
             }
@@ -49,10 +48,12 @@ Shader "Custom/URP2D/SpriteCastShadow"
             #pragma fragment FragShadowCaster
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Assets/Resources/Shaders/Common/CommonShaderMethods.hlsl"
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            float _Cutoff;
+            TEXTURE2D (_MainTex);
+            SAMPLER (sampler_MainTex);
+            // float _Cutoff;
+            float _DissolvePercent;
 
             struct Attributes
             {
@@ -76,11 +77,11 @@ Shader "Custom/URP2D/SpriteCastShadow"
 
             half4 FragShadowCaster(Varyings IN) : SV_Target
             {
-                // 1. 先用纹理 alpha 做 clip()
                 half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
-                clip(alpha - _Cutoff);
+                float noise = (GradientNoise(IN.uv, 5) + 0.1) / 1.1;
 
-                // 2. 不需要输出任何颜色，写深度就行
+                clip(alpha * noise - 0.01 - _DissolvePercent * 1.3);
+
                 return 0;
             }
             ENDHLSL
@@ -114,15 +115,16 @@ Shader "Custom/URP2D/SpriteCastShadow"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
+            TEXTURE2D (_MainTex);
+            SAMPLER (sampler_MainTex);
 
             // float4x4 _AdditionalLightsWorldToShadow[MAX_VISIBLE_LIGHTS];
 
             float4 _Color;
-            float _Cutoff, _NoiseScale;
+            float _NoiseScale;
             float _ShakeStrength;
             float _ShakeSpeed;
+            float _DissolvePercent;
 
 
             struct Attributes
@@ -197,8 +199,14 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 float shadow = SampleShadowmap(
                     TEXTURE2D_ARGS(_AdditionalLightsShadowmapTexture, sampler_LinearClampCompare), shadowCoord, shadowSamplingData, shadowParams, true);
 
+                _DissolvePercent *= 1.3;
+                float dissolveNoise = (GradientNoise(IN.uv, 5) + 0.1) / 1.1;
+                float edge = step(dissolveNoise, (_DissolvePercent-0.05)) - step(dissolveNoise, _DissolvePercent - 0.1);
+                clip(tex.a * dissolveNoise - _DissolvePercent + 0.1);
+
                 return half4(
-                    tex.rgb * _Color * noise * IN.color.r * finalLight * 1.5 * saturate(shadow + 0.2), tex.a * IN.color.a);
+                    tex.rgb * _Color * noise * IN.color.r * finalLight * saturate(shadow + 0.2) * saturate(1 - edge) + (edge * 10) * float3(1, 0.05, 0.01),
+                    tex.a * IN.color.a);
             }
             ENDHLSL
         }

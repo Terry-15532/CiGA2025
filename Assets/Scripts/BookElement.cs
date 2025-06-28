@@ -1,9 +1,11 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Rendering.Universal;
 
 public class BookElement : CustomElement{
     private Coroutine animationCoroutine;
+    public DecalProjector[] decals;
 
     [Header("是否自动检测e直立角度")]
     public bool autoDetectTargetDegree = true;
@@ -14,19 +16,54 @@ public class BookElement : CustomElement{
     [Header("倒下的角度")]
     public float initialDegree = -90f;
 
+    public bool isDecal = true;
+
     public void Awake(){
-        if (autoDetectTargetDegree){
-            targetDegree = transform.localEulerAngles.x;
-            SetXRotation(initialDegree + 0.01f);
+        decals = GetComponentsInChildren<DecalProjector>();
+        if (decals == null || decals.Length < 1){
+            isDecal = false;
+            if (autoDetectTargetDegree){
+                targetDegree = transform.localEulerAngles.x;
+                SetXRotation(initialDegree + 0.01f);
+            }
         }
         base.Awake();
     }
 
-    void Update(){
-        if (Input.GetKeyDown(KeyCode.Space)){
-            FallDown();
-        }
+    // void Update(){
+    //     if (Input.GetKeyDown(KeyCode.Space)){
+    //         FallDown();
+    //     }
+    //
+    // }
 
+    // Coroutine decalAni;
+
+    public void DecalFadeIn(float time = 1.5f){
+        foreach (var decal in decals){
+            if (decal != null){
+                decal.enabled = true;
+                StartCoroutine(Tools.Repeat((f) => {
+                    decal.fadeFactor = f;
+                }, time, new WaitForEndOfFrame(), () => {
+                    decal.fadeFactor = 1;
+                }));
+            }
+        }
+    }
+
+    public void DecalFadeOut(float time = 2f){
+        foreach (var decal in decals){
+            if (decal != null){
+                decal.enabled = true;
+                StartCoroutine(Tools.Repeat((f) => {
+                    decal.fadeFactor = 1 - f;
+                }, time, new WaitForEndOfFrame(), () => {
+                    decal.fadeFactor = 0;
+
+                }));
+            }
+        }
     }
 
     private float EaseOutElastic(float t){
@@ -37,8 +74,14 @@ public class BookElement : CustomElement{
         return Mathf.Pow(2, -10 * t) * Mathf.Sin((t * 10 - 0.75f) * c4) + 1;
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     public void PopUp(){
-        PopUp(startAngle: initialDegree, settleAngle: targetDegree);
+        if (decals == null || decals?.Length < 1){
+            PopUp(startAngle: initialDegree, settleAngle: targetDegree);
+        }
+        else{
+            DecalFadeIn(1f);
+        }
     }
 
     /// <summary>
@@ -92,9 +135,14 @@ public class BookElement : CustomElement{
     /// 倒下动画（模拟重力加速度）
     /// </summary>
     public void FallDown(float acc = 5f){
-        if (animationCoroutine != null)
-            StopCoroutine(animationCoroutine);
-        animationCoroutine = StartCoroutine(FallDownRoutine(acc));
+        if (decals == null || decals.Length < 1){
+            if (animationCoroutine != null)
+                StopCoroutine(animationCoroutine);
+            animationCoroutine = StartCoroutine(FallDownRoutine(acc));
+        }
+        else{
+            DecalFadeOut(1f);
+        }
     }
 
     private IEnumerator FallDownRoutine(float acc){

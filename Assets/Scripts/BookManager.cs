@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BookManager : MonoBehaviour{
-    public static List<BookManager> instances = new List<BookManager>();
+    public static Dictionary<int, BookManager> instances = new Dictionary<int, BookManager>();
     public static BookManager currInstance;
+    static readonly int dissolvePercentID = Shader.PropertyToID("_DissolvePercent");
     public BookElement[] bookElements;
+    public BookElement levelPreview;
     public int levelIndex;
 
 
@@ -15,7 +17,7 @@ public class BookManager : MonoBehaviour{
     }
 
     public void Awake(){
-        Initialize();
+        instances.Add(levelIndex, this);
     }
 
     public void Start(){
@@ -23,22 +25,28 @@ public class BookManager : MonoBehaviour{
             bookElement.gameObject.SetActive(false);
         }
         if (levelIndex == 1){
-            ShowElements(0);
+            currInstance = this;
+            levelPreview?.DecalFadeIn();
+            ShowElements(3f);
+            Debug.Log("Showed Elements");
         }
     }
 
-    public void Initialize(){
-        instances.Add(this);
-        currInstance = this;
+    public void Update(){
+        if (this == currInstance && Input.GetKeyDown(KeyCode.Space)){
+            NextLevel();
+        }
     }
 
     public void ShowElements(float delay = 2.5f){
         Tools.CallDelayed(() => {
+            levelPreview?.DecalFadeOut();
+            Debug.Log("Faded");
+            Shader.SetGlobalFloat(dissolvePercentID, 1);
+            StartCoroutine(Tools.Repeat((f) => { Shader.SetGlobalFloat(dissolvePercentID, 1 - f); }, 2f, new WaitForEndOfFrame(), () => { Shader.SetGlobalFloat(dissolvePercentID, 0f); }));
             foreach (var bookElement in bookElements){
                 try{
                     bookElement.SetActive(true);
-                    bookElement.SetAttr(0, ColorAttr.a);
-                    bookElement.SetAttrAni(0, 1, time: 1f, ColorAttr.a);
                 }
                 finally{ }
             }
@@ -47,7 +55,7 @@ public class BookManager : MonoBehaviour{
             foreach (var bookElement in bookElements){
                 bookElement.PopUp();
             }
-        }, delay + 1f);
+        }, delay + 2.5f);
     }
 
     public void FallDown(){
@@ -55,19 +63,28 @@ public class BookManager : MonoBehaviour{
             bookElement.FallDown();
         }
         Tools.CallDelayed(() => {
+            StartCoroutine(Tools.Repeat((f) => { Shader.SetGlobalFloat(dissolvePercentID, f); }, 2f, new WaitForEndOfFrame(), () => { Shader.SetGlobalFloat(dissolvePercentID, 1f); }));
+        }, 1f);
+        Tools.CallDelayed(() => {
             foreach (var bookElement in bookElements){
-                bookElement.SetAttrAni(1, 0, time: 1f, ColorAttr.a);
+                bookElement.SetActive(false);
             }
-        }, 2f);
+        }, 3.5f);
     }
 
     public void NextLevel(){
-        var animator = GameObject.Find("BookAndTable").GetComponent<Animator>();
-        animator.SetTrigger("NextLevel");
         FallDown();
-        if (GetNextManager() != null){
-            GetNextManager().ShowElements();
-        }
+        Tools.CallDelayed(() => {
+            var animator = GameObject.Find("BookAndTable").GetComponent<Animator>();
+            animator.SetTrigger("NextPage");
+            Tools.CallDelayed(() => {
+                var nextManager = GetNextManager();
+                if (nextManager != null){
+                    nextManager.ShowElements();
+                    currInstance = nextManager;
+                }
+            }, 3.5f);
+        }, 2f);
     }
 
 }

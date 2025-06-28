@@ -9,7 +9,7 @@ public class SpriteChanger : MonoBehaviour{
 
     [Header("播放动画结束后调用的事件")]
     public UnityEvent onAnimationEnd;
-    
+
     [Header("触碰到该物体后将图片替换为targetSprite")]
     public GameObject targetObject;
 
@@ -21,7 +21,18 @@ public class SpriteChanger : MonoBehaviour{
 
     public bool aniPlayed = false;
     public float animationDuration = 0.5f;
+
+    [Header("首次执行的动画")]
     public Sprite[] sprites;
+
+    [Header("是否循环播放第二组动画")]
+    public bool looped = false;
+
+    [Header("循环播放的动画")]
+    public Sprite[] spritesLooped;
+
+    public float loopFPS;
+
     public Coroutine animationCoroutine;
 
     public void OnTriggerEnter(Collider other){
@@ -53,6 +64,13 @@ public class SpriteChanger : MonoBehaviour{
         }
         if (onAnimationEnd != null){
             onAnimationEnd.Invoke();
+        }
+        index = 0;
+        while (looped){
+            index++;
+            index = index % spritesLooped.Length;
+            spriteRenderer.sprite = spritesLooped[index];
+            yield return new WaitForSeconds(1f / loopFPS);
         }
         spriteRenderer.sprite = targetSprite;
     }

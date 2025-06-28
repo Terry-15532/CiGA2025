@@ -31,71 +31,59 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
         ZWrite On
         ZTest [_ZTestMode]
 
-        Pass
+     Pass
         {
             Name "ShadowCaster"
             Tags
             {
                 "LightMode" = "ShadowCaster"
+                "Queue" = "AlphaTest"
+                "RenderType" = "TransparentCutout"
             }
+            Cull Off
+            ZWrite On
+            ColorMask 0 // 不写颜色，只写深度
 
             HLSLPROGRAM
-            #pragma shader_feature _CAST_SHADOW
-            #pragma shader_feature _OVERRIDE_BIAS
+            #pragma vertex VertShadowCaster
+            #pragma fragment FragShadowCaster
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Assets/Resources/Shaders/Common/CommonShaderMethods.hlsl"
 
+            TEXTURE2D (_MainTex);
+            SAMPLER (sampler_MainTex);
+            // float _Cutoff;
+            float _DissolvePercent;
 
-            #pragma vertex CustomShadowVertex
-            #pragma fragment CustomShadowFragment
-
-            float _DepthBias, _NormalBias;
-            bool _OverrideBias;
-            float _ShakeStrength;
-            float _ShakeSpeed;
-
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-
-            struct CustomVaryings
+            struct Attributes
             {
-                float4 positionCS : SV_POSITION;
+                float3 posOS : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            CustomVaryings CustomShadowVertex(Attributes v)
+            struct Varyings
             {
+                float4 posCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-                float yFactor = saturate(v.texcoord.y);
-                float timeNoise = GradientNoise(v.texcoord * 3.0 + _Time * _ShakeSpeed, 0.11);
-                float angle = timeNoise * 6.28318; // [0,1] → [0,2π]
-                float2 offset = float2(cos(angle), sin(angle)) * _ShakeStrength * yFactor;
-
-                v.positionOS.xy += offset;
-
-                #if _CAST_SHADOW
-                #if _OVERRIDE_BIAS
-                    _ShadowBias.xy = float2(_DepthBias / -10, _NormalBias / -10);
-                #endif
-				return ShadowPassVertex(v);
-                #else
-                Varyings varyings = ShadowPassVertex(v);
-                CustomVaryings vary;
-                vary.positionCS = float4(-1, -1, -1, -100);
-                vary.uv = v.texcoord;
-                return vary;
-                #endif
+            Varyings VertShadowCaster(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.posCS = TransformObjectToHClip(IN.posOS);
+                OUT.uv = IN.uv;
+                return OUT;
             }
 
-            half4 CustomShadowFragment(CustomVaryings IN) : SV_Target
+            half4 FragShadowCaster(Varyings IN) : SV_Target
             {
-                half a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
-                clip(a - _Cutoff);
-                Varyings v;
-                v.positionCS = IN.positionCS;
-                return ShadowPassFragment(v);
+                half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
+                float noise = (GradientNoise(IN.uv, 5) + 0.1) / 1.1;
+
+                clip(alpha * noise - 0.01 - _DissolvePercent * 1.3);
+
+                return 0;
             }
             ENDHLSL
         }
@@ -127,8 +115,8 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
             #include "Assets/Resources/Shaders/Common/CommonShaderMethods.hlsl"
 
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
+            TEXTURE2D (_MainTex);
+            SAMPLER (sampler_MainTex);
 
             // float4x4 _AdditionalLightsWorldToShadow[MAX_VISIBLE_LIGHTS];
 
@@ -136,6 +124,7 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
             float _Cutoff, _NoiseScale;
             float _ShakeStrength;
             float _ShakeSpeed;
+            float _DissolvePercent;
 
 
             struct Attributes
@@ -191,7 +180,7 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
                 float noise1 = GradientNoise(IN.uv + _Time * _RefractSpeed, 15);
                 float noise2 = GradientNoise(IN.uv + _Time * _RefractSpeed * float4(1.1, -1.5, 1, 1), 20);
 
-                half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, clamp(IN.uv + noise1*noise2 * 0.1, 0.1, 0.8));
+                half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, clamp(IN.uv + noise1 * noise2 * 0.1, 0.1, 0.8));
                 clip(tex.a - _Cutoff);
                 tex.rgb = AdjustSaturation(tex.rgb, IN.color.b);
                 half noise = SimpleNoise(IN.uv, _NoiseScale);
@@ -212,8 +201,15 @@ Shader "Custom/URP2D/SpriteCastShadow_Water"
                 float4 shadowCoord = mul(_AdditionalLightsWorldToShadow[shadowSliceIndex], float4(IN.positionWS, 1.0));
                 float shadow = SampleShadowmap(
                     TEXTURE2D_ARGS(_AdditionalLightsShadowmapTexture, sampler_LinearClampCompare), shadowCoord, shadowSamplingData, shadowParams, true);
+
+                _DissolvePercent *= 1.3;
+                float dissolveNoise = (GradientNoise(IN.uv, 5) + 0.1) / 1.1;
+                float edge = step(dissolveNoise, (_DissolvePercent - 0.05)) - step(dissolveNoise, _DissolvePercent - 0.1);
+                clip(tex.a * dissolveNoise - _DissolvePercent + 0.1);
+
                 return half4(
-                    tex.rgb * _Color * noise * IN.color.r * finalLight * 2 * saturate(shadow + 0.4), pow(IN.color.a * tex.a, 0.7));
+                    tex.rgb * _Color * noise * IN.color.r * finalLight * saturate(shadow + 0.4) * saturate(1 - edge) + (edge * 10) * float3(1, 0.05, 0.01),
+                    pow(IN.color.a * tex.a, 0.7));
             }
             ENDHLSL
         }
