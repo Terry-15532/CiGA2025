@@ -221,6 +221,9 @@ MonoBehaviour:
   isHeld: 0
   heldSprite: {fileID: 0}
   offset: {x: -2.83, y: 2.85, z: 0}
+  railroaded: 0
+  hand_final_pos: {x: 0, y: 0, z: 0}
+  target_object: {fileID: 0}
 --- !u!135 &360293869
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1035,6 +1038,114 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0f5e680c07cd9754093df1ce671f4bec, type: 3}
+--- !u!1 &982285901
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 982285904}
+  - component: {fileID: 982285903}
+  - component: {fileID: 982285902}
+  m_Layer: 0
+  m_Name: Railroad Object
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!135 &982285902
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 982285901}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.87485373
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!212 &982285903
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 982285901}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &982285904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 982285901}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.2847849, y: 0.647223, z: 0.2847849, w: 0.647223}
+  m_LocalPosition: {x: -0.482, y: 0.25799996, z: -0.236}
+  m_LocalScale: {x: 0.38128006, y: 0.38128, z: 0.38128}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: -47.5, y: 90, z: 0}
 --- !u!1 &1311536103
 GameObject:
   m_ObjectHideFlags: 0
@@ -1164,6 +1275,9 @@ MonoBehaviour:
   isHeld: 0
   heldSprite: {fileID: 21300000, guid: c57f8ee9d40c8a743a0db4f34e8b81b4, type: 3}
   offset: {x: -2.83, y: 2.85, z: 0}
+  railroaded: 0
+  hand_final_pos: {x: -0.5, y: 0.29, z: -0.08}
+  target_object: {fileID: 982285901}
 --- !u!114 &1311536109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1606,12 +1720,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followMouse: 1
   clickable: 0
+  clickable_railroad: 0
   holding: 0
   currObj: {fileID: 0}
   duration: 0.5
   elapsedTime: 0
   seekStrength: 5
   snapDistance: 0.1
+  isFalling: 0
+  isRising: 0
+  isRailroadingDown: 0
+  isRailroadingUp: 0
+  railroaded: 0
+  railroaddown: 0
+  hand_final_pos: {x: 0, y: 0, z: 0}
+  target_object: {fileID: 0}
+  startPos: {x: 0, y: 0, z: 0}
 --- !u!4 &1900306097
 Transform:
   m_ObjectHideFlags: 0
@@ -2674,6 +2798,7 @@ SceneRoots:
   - {fileID: 652620188}
   - {fileID: 1900306097}
   - {fileID: 1311536106}
+  - {fileID: 360293871}
   - {fileID: 1734116217}
   - {fileID: 840077092}
-  - {fileID: 360293871}
+  - {fileID: 982285904}
