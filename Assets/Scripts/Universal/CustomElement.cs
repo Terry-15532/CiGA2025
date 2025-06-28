@@ -78,8 +78,8 @@ public class CustomElement : MonoBehaviour {
 
     public virtual void Awake() {
         _childElements = GetComponentsInChildren<CustomElement>();
-        var sprite = GetComponent<SpriteRenderer>();
-        var tmp = GetComponent<TextMeshPro>();
+        var sprite = GetComponentInChildren<SpriteRenderer>();
+        var tmp = GetComponentInChildren<TextMeshPro>();
         if (sprite != null) {
             visualElement = sprite;
             elementType = ElementType.Sprite;

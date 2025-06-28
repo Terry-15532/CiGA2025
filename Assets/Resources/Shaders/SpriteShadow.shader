@@ -26,7 +26,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
             "IgnoreProjector"="True"
         }
         Cull Off
-        ZWrite On
+        ZWrite Off
         ZTest [_ZTestMode]
 
         Pass
@@ -157,6 +157,19 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 tex.rgb = AdjustSaturation(tex.rgb, IN.color.b);
                 half noise = SimpleNoise(IN.uv, _NoiseScale);
                 noise = 1 - lerp(0, 0.3, pow(noise, 2));
+
+                // float3 worldPos = (IN.positionCS).xyz;
+                // int additionalLightCount = GetAdditionalLightsCount();
+                //
+                // float3 accumulatedLighting = float3(0, 0, 0);
+                // for (int i = 0; i < additionalLightCount; i++){
+                //     Light light = GetAdditionalLight(i, worldPos);
+                //     float3 lightDir = normalize(light.direction);
+                //     float NdotL = saturate(dot(normalWS, lightDir));
+                //     accumulatedLighting += light.color * NdotL;
+                // }
+
+
                 clip(tex.a - _Cutoff);
                 return half4(tex.rgb * _Color * noise * IN.color.r, 1 * tex.a * IN.color.a);
             }
