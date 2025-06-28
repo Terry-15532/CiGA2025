@@ -134,7 +134,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 half noise = SimpleNoise(IN.uv, _NoiseScale);
                 noise = 1 - lerp(0, 0.3, pow(noise, 2));
                 clip(tex.a - _Cutoff);
-                return half4(tex.rgb * _Color * noise, 1 * tex.a * IN.color.a);
+                return half4(tex.rgb * _Color * noise * IN.color.r, 1 * tex.a * IN.color.a);
             }
             ENDHLSL
         }
