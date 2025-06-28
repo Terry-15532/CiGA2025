@@ -19,7 +19,7 @@ public class SpriteChanger : MonoBehaviour{
     [Header("是否仅播放一次动画")]
     public bool singleAnimation = true;
 
-    bool aniPlayed = false;
+    public bool aniPlayed = false;
     public float animationDuration = 0.5f;
 
     [Header("首次执行的动画")]
