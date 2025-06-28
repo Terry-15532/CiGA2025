@@ -75,12 +75,12 @@ public class BookElement : MonoBehaviour {
         float angle = currentAngle;
         float velocity = 0f;
 
-        while (angle > 0f) {
+        while (angle > -90f) {
             velocity += gravity * Time.deltaTime;
             angle -= velocity * Time.deltaTime;
 
-            if (angle <= 0f) {
-                angle = 0f;
+            if (angle <= -90f) {
+                angle = -90f;
                 break;
             }
 

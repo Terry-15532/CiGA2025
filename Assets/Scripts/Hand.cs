@@ -1,23 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Hand : MonoBehaviour
 {
-    float yval;
+    float yVal, yValHand, targetY;
     bool clickable = false;
     bool holding = false;
     ObjectInteract currObj;
 
+    public float acceleration = 9.81f; // Acceleration rate
+    public float deceleration = 9.81f;
+    public float maxSpeed = 20f;     // Optional cap on falling speed
+    public float startRiseSpeed = 4f;
+    private float currentSpeed = 0f;
+    bool isFalling = false;
+    bool isRising = false;
+
     private void Start()
     {
-        yval = transform.position.y;
+        yVal = transform.position.y;
+        yValHand = transform.Find("Hand").position.y;
+        targetY = yValHand + 0.3f;
     }
 
     void Update()
     {
         // Update sprite position
-        transform.position = GetMousePositionInXZPlane(yval);
+        transform.position = GetMousePositionInXZPlane(yVal);
 
         // Rotate only around X to face the camera
         //FaceCameraOnXAxisOnly();
@@ -28,13 +39,58 @@ public class Hand : MonoBehaviour
             Vector3 handPos = transform.Find("Hand").position;
             currObj.transform.localPosition = /*new Vector3(handPos.x, handPos.y, handPos.z) +*/ new Vector3(0.42f, 9.56f, -0.62f);
             holding = true;
+            transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 1;
+            currentSpeed = startRiseSpeed;
+            isRising = true;
         }
         else if(holding && Input.GetMouseButtonDown(0))
         {
             currObj.transform.SetParent(null);
             currObj.Release();
             holding = false;
+            isFalling = true;
         }
+
+        if (isFalling && transform.Find("Hand").position.y > yValHand)
+        {
+            // Accelerate downward
+            currentSpeed += acceleration * Time.deltaTime;
+            currentSpeed = Mathf.Min(currentSpeed, maxSpeed);
+
+            // Move the object
+            transform.Find("Hand").position -= new Vector3(0, currentSpeed * Time.deltaTime, 0);
+
+            // Clamp if overshooting
+            if (transform.Find("Hand").position.y <= yValHand)
+            {
+                Vector3 pos = transform.Find("Hand").position;
+                pos.y = yValHand;
+                transform.Find("Hand").position = pos;
+                currentSpeed = 0f; // Stop
+                transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 3;
+                isFalling = false;
+            }
+        }
+        else if (isRising && transform.Find("Hand").position.y < targetY)
+        {
+            // Move upward
+            transform.Find("Hand").position += new Vector3(0, currentSpeed * Time.deltaTime, 0);
+
+            // Decelerate
+            currentSpeed -= deceleration * Time.deltaTime;
+
+            // Clamp if overshooting
+            if (transform.Find("Hand").position.y >= targetY)
+            {
+                Vector3 pos = transform.Find("Hand").position;
+                pos.y = targetY;
+                transform.Find("Hand").position = pos;
+                currentSpeed = 0f; // Stop
+                isRising = false;
+            }
+        }
+
+
     }
 
     public Vector3 GetMousePositionInXZPlane(float yPlane)
