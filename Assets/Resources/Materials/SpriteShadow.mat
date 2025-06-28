@@ -39,7 +39,7 @@ Material:
     - _NoiseScale: 500
     - _NormalBias: 0.33
     - _ShakeSpeed: 5
-    - _ShakeStrength: 0.01
+    - _ShakeStrength: 0.005
     m_Colors:
     - _Color: {r: 1, g: 0.92392933, b: 0.828841, a: 1}
   m_BuildTextureStacks: []
