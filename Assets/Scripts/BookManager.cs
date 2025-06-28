@@ -47,7 +47,7 @@ public class BookManager : MonoBehaviour{
             foreach (var bookElement in bookElements){
                 bookElement.PopUp();
             }
-        }, 3.5f);
+        }, delay + 1f);
     }
 
     public void FallDown(){
