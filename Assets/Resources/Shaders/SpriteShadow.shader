@@ -119,10 +119,8 @@ Shader "Custom/URP2D/SpriteCastShadow"
 
             float3 AdjustSaturation(float3 color, float saturation)
             {
-                // 使用 luminance 系数计算灰度值（人眼对不同颜色敏感度不同）
                 float gray = dot(color, float3(0.299, 0.587, 0.114));
 
-                // 从灰度（无饱和度）插值回原色（完整饱和度）
                 return lerp(float3(gray, gray, gray), color, saturation);
             }
 

@@ -1367,7 +1367,7 @@ GameObject:
   - component: {fileID: 1164246442}
   - component: {fileID: 1164246441}
   m_Layer: 0
-  m_Name: Book&Table_2.0
+  m_Name: BookAndTable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
