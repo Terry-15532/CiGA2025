@@ -36,9 +36,10 @@ Material:
     - _AlphaCutOff: 0.05
     - _Cutoff: 0.1
     - _DepthBias: 0.36
+    - _DissolvePercent: 0
     - _NoiseScale: 500
     - _NormalBias: 0.33
-    - _ShakeSpeed: 2
+    - _ShakeSpeed: 0
     - _ShakeStrength: 0
     - _ZTestMode: 4
     m_Colors:
