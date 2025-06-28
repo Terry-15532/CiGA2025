@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SpriteShadow
+  m_Name: SpriteShadow_ZTestAlways
   m_Shader: {fileID: 4800000, guid: 1289c17cad9792848b8474d6526e33a3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -40,6 +40,7 @@ Material:
     - _NormalBias: 0.33
     - _ShakeSpeed: 2
     - _ShakeStrength: 0.01
+    - _ZTestMode: 8
     m_Colors:
     - _Color: {r: 1, g: 0.92392933, b: 0.828841, a: 1}
   m_BuildTextureStacks: []

@@ -49,10 +49,10 @@ MonoBehaviour:
     m_Value: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1
   scatter:
-    m_OverrideState: 0
-    m_Value: 0.475
+    m_OverrideState: 1
+    m_Value: 0.368
   clamp:
     m_OverrideState: 0
     m_Value: 65472
@@ -105,21 +105,21 @@ MonoBehaviour:
     m_Value: 0
   focusDistance:
     m_OverrideState: 1
-    m_Value: 2.09
+    m_Value: 2.6
   aperture:
     m_OverrideState: 1
-    m_Value: 14.7
+    m_Value: 16.3
   focalLength:
     m_OverrideState: 1
-    m_Value: 172
+    m_Value: 187
   bladeCount:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 5
   bladeCurvature:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1
   bladeRotation:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: -72
 --- !u!114 &-6673664236382414349
 MonoBehaviour:
@@ -139,7 +139,7 @@ MonoBehaviour:
     m_Value: 1
   tintColor:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.9041909, b: 0.65094334, a: 1}
+    m_Value: {r: 1, g: 0.7303371, b: 0, a: 1}
   bloomMip:
     m_OverrideState: 0
     m_Value: 1
@@ -187,7 +187,7 @@ MonoBehaviour:
     m_Value: 4
   chromaticAbberationIntensity:
     m_OverrideState: 1
-    m_Value: 0.571
+    m_Value: 0.676
 --- !u!114 &-16713081240580372
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -203,7 +203,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.18
+    m_Value: 0.118
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

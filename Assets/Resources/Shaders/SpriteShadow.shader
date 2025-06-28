@@ -10,6 +10,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
         [Space(10)]
         [Toggle(_CAST_SHADOW)] _CastShadow ("Cast Sahdow", Integer) = 0
         [Toggle(_OVERRIDE_BIAS)] _OverrideBias ("Override Shadow Bias", Integer) = 0
+        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTestMode ("ZTest Mode", Float) = 4
         _DepthBias ("Depth Bias", Range(-1, 1)) = 0
         _NormalBias ("Normal Bias", Range(-1, 1)) = 0
         _ShakeStrength ("Shake Strength", Range(0, 0.5)) = 0.1
@@ -26,7 +27,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
         }
         Cull Off
         ZWrite On
-        ZTest LEqual
+        ZTest [_ZTestMode]
 
         Pass
         {
@@ -91,9 +92,13 @@ Shader "Custom/URP2D/SpriteCastShadow"
             #pragma vertex vert
             #pragma fragment fragBase
             #pragma multi_compile _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+
             #pragma multi_compile _SHADOWS_SOFT
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Assets/Resources/Shaders/Common/CommonShaderMethods.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
 
             TEXTURE2D (_MainTex);
             SAMPLER (sampler_MainTex);
