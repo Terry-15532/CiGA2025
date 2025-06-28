@@ -37,11 +37,11 @@ MonoBehaviour:
   m_ProbeVolumeMemoryBudget: 1024
   m_SupportProbeVolumeStreaming: 0
   m_ProbeVolumeSHBands: 1
-  m_MainLightRenderingMode: 1
+  m_MainLightRenderingMode: 0
   m_MainLightShadowsSupported: 1
   m_MainLightShadowmapResolution: 4096
   m_AdditionalLightsRenderingMode: 1
-  m_AdditionalLightsPerObjectLimit: 1
+  m_AdditionalLightsPerObjectLimit: 2
   m_AdditionalLightShadowsSupported: 1
   m_AdditionalLightsShadowmapResolution: 4096
   m_AdditionalLightsShadowResolutionTierLow: 256

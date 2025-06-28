@@ -1,5 +1,5 @@
 //#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/UnityInput.hlsl"
-#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+// #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
 float2 unity_gradientNoise_dir(float2 p){
     p = p % 289;

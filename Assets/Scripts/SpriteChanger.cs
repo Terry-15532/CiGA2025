@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SpriteChanger : MonoBehaviour{
     public Sprite targetSprite;
 
+    [Header("播放动画结束后调用的事件")]
+    public UnityEvent onAnimationEnd;
+    
     [Header("触碰到该物体后将图片替换为targetSprite")]
     public GameObject targetObject;
 
@@ -46,7 +50,9 @@ public class SpriteChanger : MonoBehaviour{
             index++;
             yield return new WaitForSeconds(interval);
         }
-
+        if (onAnimationEnd != null){
+            onAnimationEnd.Invoke();
+        }
         spriteRenderer.sprite = targetSprite;
     }
 }
