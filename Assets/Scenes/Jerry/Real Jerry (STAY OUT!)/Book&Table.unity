@@ -430,6 +430,7 @@ MonoBehaviour:
   railroaded: 0
   hand_final_pos: {x: 0, y: 0, z: 0}
   target_object: {fileID: 0}
+  selectedCreature: 2
 --- !u!212 &132502634
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1175,6 +1176,7 @@ MonoBehaviour:
   railroaded: 0
   hand_final_pos: {x: 0, y: 0, z: 0}
   target_object: {fileID: 0}
+  selectedCreature: 1
 --- !u!135 &351079594
 SphereCollider:
   m_ObjectHideFlags: 0

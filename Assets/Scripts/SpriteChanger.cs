@@ -66,7 +66,7 @@ public class SpriteChanger : MonoBehaviour{
         }
         else if (creature == "Jellyfish")
         {
-            SoundSys.PlaySound("plate becomes jellyfish");
+            //SoundSys.PlaySound("plate becomes jellyfish");
         }
 
         while (index < sprites.Length){

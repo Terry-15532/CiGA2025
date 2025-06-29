@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Hand : MonoBehaviour
 {
@@ -62,6 +63,11 @@ public class Hand : MonoBehaviour
             ReleaseObjectNoRise();
             holding = false;
             transform.Find("Hand").localPosition = localHandPos;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         
         // Update sprite position

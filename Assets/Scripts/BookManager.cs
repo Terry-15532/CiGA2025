@@ -12,13 +12,15 @@ public class BookManager : MonoBehaviour{
     public BookElement levelPreview;
     public int levelIndex;
 
+    private static Sound bgm;
+
 
     private BookManager GetNextManager(){
         return instances.Count > currInstance.levelIndex ? instances[currInstance.levelIndex + 1] : null;
     }
 
     public void Awake(){
-        instances.Add(levelIndex, this);
+        instances.TryAdd(levelIndex, this);
     }
 
     public void Start(){
@@ -26,7 +28,10 @@ public class BookManager : MonoBehaviour{
             bookElement.gameObject.SetActive(false);
         }
         if (levelIndex == 1){
-            SoundSys.PlaySound("bgm 1", true);
+            if (bgm == null)
+            {
+                bgm = SoundSys.PlaySound("bgm 1", true);
+            }
             currInstance = this;
             levelPreview?.DecalFadeIn();
             ShowElements(3f);

@@ -27,6 +27,8 @@ public class ObjectInteract : MonoBehaviour
     public Vector3 hand_final_pos;
     public GameObject target_object;
 
+    private bool gravityFallRoutineRunning = false;
+
     public enum CreatureType
     {
         Default,
@@ -50,24 +52,9 @@ public class ObjectInteract : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isFalling && transform.position.y > yVal)
+        if (isFalling && !gravityFallRoutineRunning)
         {
-            // Accelerate downward
-            currentSpeed += acceleration * Time.deltaTime;
-            currentSpeed = Mathf.Min(currentSpeed, maxSpeed);
-
-            // Move the object
-            transform.position -= new Vector3(0, currentSpeed * Time.deltaTime, 0);
-
-            // Clamp if overshooting
-            if (transform.position.y <= yVal)
-            {
-                Vector3 pos = transform.position;
-                pos.y = yVal;
-                transform.position = pos;
-                currentSpeed = 0f; // Stop
-                isFalling = false;
-            }
+            StartCoroutine(GravityFallRoutineWrapper());
         }
     }
 
@@ -106,6 +93,10 @@ public class ObjectInteract : MonoBehaviour
     public void Release()
     {
         //transform.position = new Vector3(transform.position.x, yVal, transform.position.z);
+        if (transform.position.y < yVal)
+        {
+            transform.position = new Vector3(transform.position.x, yVal, transform.position.z);
+        }
         isFalling = true;
     }
 
@@ -135,7 +126,7 @@ public class ObjectInteract : MonoBehaviour
         }
         else if (selectedCreature.ToString() == "Jellyfish")
         {
-            SoundSys.PlaySound("jellyfish setdown");
+            SoundSys.PlaySound("plate becomes jellyfish");
         }
         if (heldSprite != null)
         {
@@ -143,5 +134,38 @@ public class ObjectInteract : MonoBehaviour
         }
     }
 
+    IEnumerator GravityFallRoutineWrapper()
+    {
+        gravityFallRoutineRunning = true;
+        yield return StartCoroutine(GravityFallRoutine());
+        gravityFallRoutineRunning = false;
+    }
+
+    IEnumerator GravityFallRoutine()
+    {
+        currentSpeed = 0f;
+
+        while (transform.position.y > yVal)
+        {
+            currentSpeed += acceleration * Time.deltaTime;
+            currentSpeed = Mathf.Min(currentSpeed, maxSpeed);
+
+            transform.position -= new Vector3(0, currentSpeed * Time.deltaTime, 0);
+
+            // Clamp at target height
+            if (transform.position.y <= yVal)
+            {
+                Vector3 pos = transform.position;
+                pos.y = yVal;
+                transform.position = pos;
+                break;
+            }
+
+            yield return null;
+        }
+
+        currentSpeed = 0f;
+        isFalling = false;
+    }
 }
 
