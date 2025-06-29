@@ -27,6 +27,14 @@ public class ObjectInteract : MonoBehaviour
     public Vector3 hand_final_pos;
     public GameObject target_object;
 
+    public enum CreatureType
+    {
+        Default,
+        Dog,
+        Jellyfish,
+        Bee
+    }
+    public CreatureType selectedCreature;
 
     // Start is called before the first frame update
     void Start()
@@ -63,6 +71,22 @@ public class ObjectInteract : MonoBehaviour
         }
     }
 
+    private void OnMouseEnter()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sharedMaterial.SetFloat(emissionID, 2.5f);
+        sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
+        sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
+    }
+
+    private void OnMouseExit()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sharedMaterial.SetFloat(emissionID, 1);
+        sr.sharedMaterial.SetFloat(thresholdID, 2f);
+        sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (!(playanim_disable_click && GetComponent<SpriteChanger>().aniPlayed) && other.CompareTag("Hand"))
@@ -88,6 +112,14 @@ public class ObjectInteract : MonoBehaviour
     public void StartHolding()
     {
         isHeld = true;
+        if (selectedCreature.ToString() == "Dog")
+        {
+            SoundSys.PlaySound("dog pickup");
+        }
+        else if (selectedCreature.ToString() == "Jellyfish")
+        {
+            SoundSys.PlaySound("jellyfish pickup");
+        }
         if (heldSprite != null)
         {
             GetComponent<SpriteRenderer>().sprite = heldSprite;
@@ -97,6 +129,14 @@ public class ObjectInteract : MonoBehaviour
     public void StopHolding()
     {
         isHeld = false;
+        if (selectedCreature.ToString() == "Dog")
+        {
+            SoundSys.PlaySound("dog setdown");
+        }
+        else if (selectedCreature.ToString() == "Jellyfish")
+        {
+            SoundSys.PlaySound("jellyfish setdown");
+        }
         if (heldSprite != null)
         {
             GetComponent<SpriteRenderer>().sprite = oldSprite;

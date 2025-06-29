@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Hand : MonoBehaviour
@@ -32,12 +33,19 @@ public class Hand : MonoBehaviour
     public Vector3 startPos;
 
     private Vector3 localHandPos;
+    private bool fallRoutineRunning = false;
+    private bool riseRoutineRunning = false;
+    private bool railroadDownRoutineRunning = false;
+    private bool railroadUpRoutineRunning = false;
+
+    Transform hand;
 
     private void Start()
     {
+        hand = transform.Find("Hand");
         yVal = transform.position.y;
-        yValHand = transform.Find("Hand").position.y;
-        localHandPos = transform.Find("Hand").localPosition;
+        yValHand = hand.position.y;
+        localHandPos = hand.localPosition;
     }
 
     void Update()
@@ -105,89 +113,117 @@ public class Hand : MonoBehaviour
             isFalling = true;
         }
 
-        if (isFalling && transform.Find("Hand").position.y > yVal)
+        if (isFalling && !fallRoutineRunning)
         {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
+            StartCoroutine(FallRoutine());
+        }
+        else if (isRising && !riseRoutineRunning)
+        {
+            StartCoroutine(RiseRoutine());
+        }
+        else if (isRailroadingDown && !railroadDownRoutineRunning)
+        {
+            StartCoroutine(RailroadDownRoutine());
+        }
+        else if (isRailroadingUp && !railroadUpRoutineRunning)
+        {
+            StartCoroutine(RailroadUpRoutine());
+        }
 
-            // Eased fall: smooth at start and end
+    }
+
+    IEnumerator FallRoutine()
+    {
+        fallRoutineRunning = true;
+        float t = 0f;
+        Vector3 pos = hand.position;
+
+        while (t < 1f && pos.y > yVal)
+        {
+            t += Time.deltaTime / duration;
             float easedT = Mathf.SmoothStep(0f, 1f, t);
             float newY = Mathf.Lerp(yValHand, yVal, easedT);
 
-            Vector3 pos = transform.Find("Hand").position;
+            pos = hand.position;
             pos.y = newY;
-            transform.Find("Hand").position = pos;
+            hand.position = pos;
 
-            if (t >= 1f)
-            {
-                isFalling = false;
-                if (!holding)
-                {
-                    TakeObject();
-                }
-                else
-                {
-                    ReleaseObject();
-                }
-                
-            }
+            yield return null;
         }
-        else if (isRising && transform.Find("Hand").position.y < yValHand)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
 
-            // Smoothstep easing (ease-in and ease-out)
+        isFalling = false;
+        fallRoutineRunning = false;
+
+        if (!holding)
+            TakeObject();
+        else
+            ReleaseObject();
+    }
+
+    IEnumerator RiseRoutine()
+    {
+        riseRoutineRunning = true;
+        float t = 0f;
+        Vector3 pos = hand.position;
+
+        while (t < 1f && pos.y < yValHand)
+        {
+            t += Time.deltaTime / duration;
             float easedT = Mathf.SmoothStep(0f, 1f, t);
             float newY = Mathf.Lerp(yVal, yValHand, easedT);
 
-            Vector3 pos = transform.Find("Hand").position;
+            pos = hand.position;
             pos.y = newY;
-            transform.Find("Hand").position = pos;
+            hand.position = pos;
 
-            if (t >= 1f)
-            {
-                isRising = false;
-                seekMouse = true;
-            }
-        }
-        else if (isRailroadingDown)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-
-            // Smooth easing (ease-in, ease-out)
-            float easedT = Mathf.SmoothStep(0f, 1f, t);
-
-            transform.Find("Hand").position = Vector3.Lerp(startPos, hand_final_pos, easedT);
-
-            if (t >= 1f)
-            {
-                isRailroadingDown = false;
-                railroaddown = true;
-                ReleaseObject();
-            }
-        }
-        else if (isRailroadingUp)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-
-            // Smooth easing (ease-in, ease-out)
-            float easedT = Mathf.SmoothStep(0f, 1f, t);
-
-            transform.Find("Hand").position = Vector3.Lerp(hand_final_pos, startPos, easedT);
-
-            if (t >= 1f)
-            {
-                isRailroadingUp = false;
-                railroaded = false;
-                seekMouse = true;
-            }
+            yield return null;
         }
 
-
+        isRising = false;
+        riseRoutineRunning = false;
+        seekMouse = true;
     }
+
+    IEnumerator RailroadDownRoutine()
+    {
+        railroadDownRoutineRunning = true;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            float easedT = Mathf.SmoothStep(0f, 1f, t);
+            hand.position = Vector3.Lerp(startPos, hand_final_pos, easedT);
+
+            yield return null;
+        }
+
+        isRailroadingDown = false;
+        railroadDownRoutineRunning = false;
+        railroaddown = true;
+        ReleaseObject();
+    }
+
+    IEnumerator RailroadUpRoutine()
+    {
+        railroadUpRoutineRunning = true;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            float easedT = Mathf.SmoothStep(0f, 1f, t);
+            hand.position = Vector3.Lerp(hand_final_pos, startPos, easedT);
+
+            yield return null;
+        }
+
+        isRailroadingUp = false;
+        railroaded = false;
+        railroadUpRoutineRunning = false;
+        seekMouse = true;
+    }
+
 
     public Vector3 GetMousePositionInXZPlane(float yPlane)
     {
@@ -226,7 +262,7 @@ public class Hand : MonoBehaviour
         else if (currObj.GetComponent<SpriteChanger>() != null && currObj.GetComponent<SpriteChanger>().targetObject == obj.gameObject)
         {
             Debug.Log("Starting outline");
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
             sr.sharedMaterial.SetFloat(emissionID, 20f);
             sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
             sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
@@ -244,7 +280,7 @@ public class Hand : MonoBehaviour
         else if (currObj.GetComponent<SpriteChanger>() != null && currObj.GetComponent<SpriteChanger>().targetObject == obj.gameObject)
         {
             Debug.Log("Stopping outline");
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
             sr.sharedMaterial.SetFloat(emissionID, 1);
             sr.sharedMaterial.SetFloat(thresholdID, 2f);
             sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
@@ -289,12 +325,14 @@ public class Hand : MonoBehaviour
     {
         if (currObj != null)
         {
-            currObj.transform.SetParent(transform.Find("Hand"));
+            Quaternion tempRot = currObj.transform.rotation;
+            currObj.transform.SetParent(hand);
             currObj.StartHolding();
-            Vector3 handPos = transform.Find("Hand").position;
+            currObj.transform.rotation = tempRot;
+            Vector3 handPos = hand.position;
             currObj.transform.localPosition = currObj.offset;
             holding = true;
-            transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 5;
+            hand.GetComponent<SpriteRenderer>().sortingOrder = 5;
             if (currObj.railroaded)
             {
                 railroaded = true;
@@ -314,7 +352,11 @@ public class Hand : MonoBehaviour
             currObj.StopHolding();
             currObj.Release();
             holding = false;
-            transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
+            hand.GetComponent<SpriteRenderer>().sortingOrder = 7;
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 1);
+            sr.sharedMaterial.SetFloat(thresholdID, 2f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
         }
 
         if (!railroaddown)
@@ -340,6 +382,10 @@ public class Hand : MonoBehaviour
             currObj.Release();
             holding = false;
             transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 1);
+            sr.sharedMaterial.SetFloat(thresholdID, 2f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
         }
     }
 

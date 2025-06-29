@@ -20,6 +20,12 @@ public class StartButton : MonoBehaviour
 
     public void StartPressed()
     {
-        SceneSwitching.SwitchTo("SampleScene");
+        SoundSys.PlaySound("start game");
+        SceneSwitching.SwitchTo("SampleScene", 0.5f, 0.5f);
+    }
+
+    private void OnMouseEnter()
+    {
+        SoundSys.PlaySound("button hover");
     }
 }
