@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class BookManager : MonoBehaviour{
     public static Dictionary<int, BookManager> instances = new Dictionary<int, BookManager>();
@@ -25,6 +26,7 @@ public class BookManager : MonoBehaviour{
             bookElement.gameObject.SetActive(false);
         }
         if (levelIndex == 1){
+            SoundSys.PlaySound("bgm 1", true);
             currInstance = this;
             levelPreview?.DecalFadeIn();
             ShowElements(3f);

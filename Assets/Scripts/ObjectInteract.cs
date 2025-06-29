@@ -27,6 +27,14 @@ public class ObjectInteract : MonoBehaviour
     public Vector3 hand_final_pos;
     public GameObject target_object;
 
+    public enum CreatureType
+    {
+        Default,
+        Dog,
+        Jellyfish,
+        Bee
+    }
+    public CreatureType selectedCreature;
 
     // Start is called before the first frame update
     void Start()
@@ -104,6 +112,14 @@ public class ObjectInteract : MonoBehaviour
     public void StartHolding()
     {
         isHeld = true;
+        if (selectedCreature.ToString() == "Dog")
+        {
+            SoundSys.PlaySound("dog pickup");
+        }
+        else if (selectedCreature.ToString() == "Jellyfish")
+        {
+            SoundSys.PlaySound("jellyfish pickup");
+        }
         if (heldSprite != null)
         {
             GetComponent<SpriteRenderer>().sprite = heldSprite;
@@ -113,6 +129,14 @@ public class ObjectInteract : MonoBehaviour
     public void StopHolding()
     {
         isHeld = false;
+        if (selectedCreature.ToString() == "Dog")
+        {
+            SoundSys.PlaySound("dog setdown");
+        }
+        else if (selectedCreature.ToString() == "Jellyfish")
+        {
+            SoundSys.PlaySound("jellyfish setdown");
+        }
         if (heldSprite != null)
         {
             GetComponent<SpriteRenderer>().sprite = oldSprite;

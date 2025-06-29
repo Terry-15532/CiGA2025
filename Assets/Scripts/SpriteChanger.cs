@@ -57,11 +57,26 @@ public class SpriteChanger : MonoBehaviour{
         float elapsed = 0f;
         float interval = animationDuration / (sprites.Length - 1);
         int index = 0;
+        string creature = GetComponent<ObjectInteract>().selectedCreature.ToString();
+
+        if (creature == "Dog")
+        {
+            Debug.Log("playing sound block becomes dog");
+            SoundSys.PlaySound("block becomes dog");
+        }
+        else if (creature == "Jellyfish")
+        {
+            SoundSys.PlaySound("plate becomes jellyfish");
+        }
 
         while (index < sprites.Length){
             elapsed += Time.deltaTime;
             spriteRenderer.sprite = sprites[index];
             index++;
+            if (creature == "Dog" && index == 9)
+            {
+                SoundSys.PlaySound("dog bites plate");
+            }
             yield return new WaitForSeconds(interval);
         }
         if (onAnimationEnd != null){

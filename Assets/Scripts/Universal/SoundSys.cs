@@ -24,7 +24,7 @@ public static class SoundSys{
 				CallDelayedAsync(() => { Object.DestroyImmediate(sound.gameObject); }, clip.length);
 			}
 
-			sound.audioSource.volume = volume * Settings.data.volume;
+			sound.audioSource.volume = volume;
 			return sound;
 		}
 

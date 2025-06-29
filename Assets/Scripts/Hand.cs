@@ -315,6 +315,10 @@ public class Hand : MonoBehaviour
             currObj.Release();
             holding = false;
             transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 1);
+            sr.sharedMaterial.SetFloat(thresholdID, 2f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
         }
 
         if (!railroaddown)
@@ -340,6 +344,10 @@ public class Hand : MonoBehaviour
             currObj.Release();
             holding = false;
             transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
+            sr.sharedMaterial.SetFloat(emissionID, 1);
+            sr.sharedMaterial.SetFloat(thresholdID, 2f);
+            sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
         }
     }
 
