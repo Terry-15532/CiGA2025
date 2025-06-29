@@ -37,14 +37,31 @@ public class Hand : MonoBehaviour
     public GameObject target_object;
     public Vector3 startPos;
 
+    private Vector3 localHandPos;
+
     private void Start()
     {
         yVal = transform.position.y;
         yValHand = transform.Find("Hand").position.y;
+        localHandPos = transform.Find("Hand").localPosition;
     }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            followMouse = true;
+            seekMouse = false;
+            isFalling = false;
+            isRising = false;
+            isRailroadingDown = false;
+            isRailroadingUp = false;
+            railroaded = false;
+            ReleaseObjectNoRise();
+            holding = false;
+            transform.Find("Hand").localPosition = localHandPos;
+        }
+        
         // Update sprite position
         if (seekMouse)
         {
@@ -174,6 +191,7 @@ public class Hand : MonoBehaviour
                 seekMouse = true;
             }
         }
+
 
     }
 
@@ -317,6 +335,18 @@ public class Hand : MonoBehaviour
             isRailroadingUp = true;
         }
 
+    }
+
+    void ReleaseObjectNoRise()
+    {
+        if (currObj != null)
+        {
+            currObj.transform.SetParent(null);
+            currObj.StopHolding();
+            currObj.Release();
+            holding = false;
+            transform.Find("Hand").GetComponent<SpriteRenderer>().sortingOrder = 7;
+        }
     }
 
 }
