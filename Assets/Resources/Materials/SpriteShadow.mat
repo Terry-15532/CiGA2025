@@ -47,7 +47,7 @@ Material:
     - _Threshold: 2
     - _ZTestMode: 4
     m_Colors:
-    - _Color: {r: 1, g: 0.92392933, b: 0.828841, a: 1}
+    - _Color: {r: 0.99056584, g: 0.93608904, b: 0.954, a: 1}
     - _EdgeColor: {r: 0, g: 0, b: 0, a: 1}
     - _EdgeColorr: {r: 0, g: 0, b: 0, a: 0}
     - _EdgeCzolor: {r: 0, g: 0, b: 0, a: 0}
