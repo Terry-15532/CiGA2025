@@ -2069,6 +2069,7 @@ MonoBehaviour:
   gravity: 9.81
   bounceForce: 4
   horizontalMultiplier: 1.2
+  groundY: 0
   useZ: 1
 --- !u!135 &1213619778
 SphereCollider:
@@ -2632,7 +2633,7 @@ SpriteRenderer:
   m_GameObject: {fileID: 1435844270}
   m_Enabled: 1
   m_CastShadows: 2
-  m_ReceiveShadows: 1
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
@@ -2667,7 +2668,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 6
   m_Sprite: {fileID: 21300000, guid: 145e629c6ed549848a0a4c1ac88a356c, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.408, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2687,7 +2688,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.26489255, y: 0.6556157, z: 0.26489255, w: 0.6556157}
   m_LocalPosition: {x: 0.6768, y: 0.1243, z: -0.426}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.32, y: 0.32, z: 0.32}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1648874709}
@@ -2743,6 +2744,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onSecondAnimationEnd:
+    m_PersistentCalls:
+      m_Calls: []
   targetObject: {fileID: 1213619774}
   playAnimation: 1
   singleAnimation: 1
@@ -4043,7 +4047,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 7
   m_Sprite: {fileID: 21300000, guid: c0bec68ba967fdd47a5a7a617b650208, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.383, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4083,6 +4087,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetSprite: {fileID: 21300000, guid: c57f8ee9d40c8a743a0db4f34e8b81b4, type: 3}
   onAnimationEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onSecondAnimationEnd:
     m_PersistentCalls:
       m_Calls: []
   targetObject: {fileID: 1435844270}
