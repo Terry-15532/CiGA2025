@@ -9,6 +9,8 @@ public class SpriteChanger : MonoBehaviour{
 
     [Header("播放动画结束后调用的事件")]
     public UnityEvent onAnimationEnd;
+    [Header("播放第二段动画结束后调用的事件")]
+    public UnityEvent onSecondAnimationEnd;
 
     [Header("触碰到该物体后将图片替换为targetSprite")]
     public GameObject targetObject;
@@ -35,8 +37,8 @@ public class SpriteChanger : MonoBehaviour{
 
     public Coroutine animationCoroutine;
 
-    public void OnTriggerEnter(Collider other){
-        if (!aniPlayed && other.gameObject == targetObject){
+    public void CombineWith(GameObject other){
+        if (!aniPlayed && gameObject == targetObject){
             //GetComponent<ShakeOnEnter>().StopShaking();
             aniPlayed = true;
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();

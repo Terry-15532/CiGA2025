@@ -11,10 +11,11 @@ Material:
   m_Shader: {fileID: 4800000, guid: 1289c17cad9792848b8474d6526e33a3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _AFFECTEDBYDISSOLVE_ON
   - _CAST_SHADOW
   - _OVERRIDE_BIAS
-  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -30,18 +31,24 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints:
+    - _AffectedByDissolve: 1
     - _CastShadow: 1
     - _OverrideBias: 1
     m_Floats:
     - _AlphaCutOff: 0.05
     - _Cutoff: 0
     - _DepthBias: 0.36
+    - _Emission: 1
     - _NoiseScale: 500
     - _NormalBias: 0.33
     - _ShakeSpeed: 2
     - _ShakeStrength: 0.01
+    - _Threshold: 2
     - _ZTestMode: 8
     m_Colors:
     - _Color: {r: 1, g: 0.92392933, b: 0.828841, a: 1}
+    - _EdgeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EdgeColorr: {r: 0, g: 0, b: 0, a: 0}
+    - _EdgeCzolor: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -60,8 +60,8 @@ Material:
     - _DepthBias: 0
     - _NoiseScale: 1
     - _NormalBias: 0
-    - _ShakeSpeed: 2
-    - _ShakeStrength: 0
+    - _ShakeSpeed: 5
+    - _ShakeStrength: 0.01
     - _Speed: 0.1
     - _Strength: 0.05
     - _ZTestMode: 4

@@ -12,7 +12,7 @@ public class BookManager : MonoBehaviour{
     public int levelIndex;
 
 
-    public static BookManager GetNextManager(){
+    private BookManager GetNextManager(){
         return instances.Count > currInstance.levelIndex ? instances[currInstance.levelIndex + 1] : null;
     }
 
@@ -25,6 +25,7 @@ public class BookManager : MonoBehaviour{
             bookElement.gameObject.SetActive(false);
         }
         if (levelIndex == 1){
+            Hand.instance.canPickObjects = false;
             currInstance = this;
             levelPreview?.DecalFadeIn();
             ShowElements(3f);
@@ -55,6 +56,9 @@ public class BookManager : MonoBehaviour{
             foreach (var bookElement in bookElements){
                 bookElement.PopUp();
             }
+            Tools.CallDelayed(() => {
+                Hand.instance.canPickObjects = true;
+            }, 1f);
         }, delay + 2.5f);
     }
 
@@ -73,6 +77,7 @@ public class BookManager : MonoBehaviour{
     }
 
     public void NextLevel(){
+        Hand.instance.canPickObjects = false;
         FallDown();
         Tools.CallDelayed(() => {
             var animator = GameObject.Find("BookAndTable").GetComponent<Animator>();

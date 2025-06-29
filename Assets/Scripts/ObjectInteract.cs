@@ -34,9 +34,9 @@ public class ObjectInteract : MonoBehaviour
         yVal = transform.position.y;
         oldSprite = GetComponent<SpriteRenderer>().sprite;
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        sr.sharedMaterial.SetFloat(emissionID, 1);
-        sr.sharedMaterial.SetFloat(thresholdID, 2f);
-        sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
+        sr.material.SetFloat(emissionID, 1);
+        sr.material.SetFloat(thresholdID, 2f);
+        sr.material.SetColor(colorID, UnityEngine.Color.black);
     }
 
     // Update is called once per frame
@@ -104,3 +104,4 @@ public class ObjectInteract : MonoBehaviour
     }
 
 }
+
