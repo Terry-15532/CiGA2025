@@ -12,7 +12,7 @@ public class BookManager : MonoBehaviour{
     public int levelIndex;
 
 
-    public static BookManager GetNextManager(){
+    private BookManager GetNextManager(){
         return instances.Count > currInstance.levelIndex ? instances[currInstance.levelIndex + 1] : null;
     }
 
@@ -32,11 +32,11 @@ public class BookManager : MonoBehaviour{
         }
     }
 
-    public void Update(){
-        if (this == currInstance && Input.GetKeyDown(KeyCode.Space)){
-            NextLevel();
-        }
-    }
+    // public void Update(){
+    //     if (this == currInstance && Input.GetKeyDown(KeyCode.Space)){
+    //         NextLevel();
+    //     }
+    // }
 
     public void ShowElements(float delay = 2.5f){
         Tools.CallDelayed(() => {
@@ -55,6 +55,8 @@ public class BookManager : MonoBehaviour{
             foreach (var bookElement in bookElements){
                 bookElement.PopUp();
             }
+            Tools.CallDelayed(() => {
+            }, 1f);
         }, delay + 2.5f);
     }
 
