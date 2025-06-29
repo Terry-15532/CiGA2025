@@ -1,0 +1,165 @@
+// using System.Collections;
+// using System.Collections.Generic;
+// using System.Drawing;
+// using Unity.VisualScripting;
+// using UnityEngine;
+// using static UnityEngine.GraphicsBuffer;
+//
+// public class ObjectInteract : MonoBehaviour
+// {
+//     float yVal;
+//     public float acceleration = 9.81f; // Acceleration rate
+//     public float maxSpeed = 20f;     // Optional cap on falling speed
+//     private float currentSpeed = 0f;
+//     public bool isFalling = false;
+//     public bool isHeld = false;
+//     public Sprite heldSprite;
+//     private Sprite oldSprite;
+//
+//     public Vector3 offset;
+//     public static int emissionID = Shader.PropertyToID("_Emission");
+//     public static int colorID = Shader.PropertyToID("_EdgeColor");
+//     public static int thresholdID = Shader.PropertyToID("_Threshold");
+//
+//     public bool playanim_disable_click = false;
+//
+//     public bool railroaded = false;
+//     public Vector3 hand_final_pos;
+//     public GameObject target_object;
+//
+//
+//     // Start is called before the first frame update
+//     void Start()
+//     {
+//         yVal = transform.position.y;
+//         oldSprite = GetComponent<SpriteRenderer>().sprite;
+//         SpriteRenderer sr = GetComponent<SpriteRenderer>();
+//         sr.material.SetFloat(emissionID, 1);
+//         sr.material.SetFloat(thresholdID, 2f);
+//         sr.material.SetColor(colorID, UnityEngine.Color.black);
+//     }
+//
+//     // Update is called once per frame
+//     void Update()
+//     {
+//         if (isFalling && transform.position.y > yVal)
+//         {
+//             // Accelerate downward
+//             currentSpeed += acceleration * Time.deltaTime;
+//             currentSpeed = Mathf.Min(currentSpeed, maxSpeed);
+//
+//             // Move the object
+//             transform.position -= new Vector3(0, currentSpeed * Time.deltaTime, 0);
+//
+//             // Clamp if overshooting
+//             if (transform.position.y <= yVal)
+//             {
+//                 Vector3 pos = transform.position;
+//                 pos.y = yVal;
+//                 transform.position = pos;
+//                 currentSpeed = 0f; // Stop
+//                 isFalling = false;
+//             }
+//         }
+//     }
+//
+//     void OnTriggerEnter(Collider other)
+//     {
+//         if (!(playanim_disable_click && GetComponent<SpriteChanger>().aniPlayed) && other.CompareTag("Hand"))
+//         {
+//             other.GetComponent<Hand>().HandEnterObjectInteract(this);
+//         }
+//     }
+//
+//     void OnTriggerExit(Collider other)
+//     {
+//         if (!(playanim_disable_click && GetComponent<SpriteChanger>().aniPlayed) && other.CompareTag("Hand"))
+//         {
+//             other.GetComponent<Hand>().HandExitObjectInteract(this);
+//         }
+//     }
+//
+//     public void Release()
+//     {
+//         //transform.position = new Vector3(transform.position.x, yVal, transform.position.z);
+//         isFalling = true;
+//     }
+//
+//     public void StartHolding()
+//     {
+//         isHeld = true;
+//         if (heldSprite != null)
+//         {
+//             GetComponent<SpriteRenderer>().sprite = heldSprite;
+//         }
+//     }
+//
+//     public void StopHolding()
+//     {
+//         isHeld = false;
+//         if (heldSprite != null)
+//         {
+//             GetComponent<SpriteRenderer>().sprite = oldSprite;
+//         }
+//     }
+//
+// }
+
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
+
+public class ObjectInteract : MonoBehaviour{
+    public void CombineWithObject(GameObject Other){
+        var changer = GetComponent<SpriteChanger>();
+        if (changer){
+            changer.CombineWith(Other);
+        }
+    }
+    public GameObject targetObject;
+    public Vector3 offset;
+    public Collider colliders;
+
+    [FormerlySerializedAs("upY")]
+    public float yAxisWhenPicked;
+
+
+    public static int emissionID = Shader.PropertyToID("_Emission");
+    public static int colorID = Shader.PropertyToID("_EdgeColor");
+    public static int thresholdID = Shader.PropertyToID("_Threshold");
+
+    public bool canBePicked;
+
+    public SpriteRenderer sr;
+
+    void Start(){
+        sr = GetComponent<SpriteRenderer>();
+        sr.material.SetFloat(emissionID, 1);
+        sr.material.SetFloat(thresholdID, 2f);
+        sr.material.SetColor(colorID, UnityEngine.Color.black);
+    }
+
+    public void OnMouseEnter(){
+        Debug.Log("Mouse entered " + gameObject.name);
+        Hand.instance.underMouse = this;
+        sr.material.SetFloat(emissionID, 30);
+        sr.material.SetFloat(thresholdID, 0.1f);
+        sr.material.SetColor(colorID, new Color(1, 0.5f, 0.1f));
+    }
+
+    public void OnMouseExit(){
+        if (Hand.instance.underMouse == this){
+            Hand.instance.underMouse = null;
+        }
+        sr.material.SetFloat(emissionID, 1);
+        sr.material.SetFloat(thresholdID, 2f);
+        sr.material.SetColor(colorID, UnityEngine.Color.black);
+    }
+
+    public void OnMouseUpAsButton(){
+        yAxisWhenPicked = transform.position.y;
+        Hand.instance.underMouse = this;
+        Hand.instance.OnObjectClicked(this);
+    }
+
+}

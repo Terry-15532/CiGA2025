@@ -11,33 +11,34 @@ using UnityEngine.EventSystems;
 using MonoBehaviour = UnityEngine.Object;
 
 
-public static class Tools {
+public static class Tools{
     private static EmptyMono _callDelayedHelper;
 
-    public static EmptyMono callDelayedHelper {
-        get {
-            if (_callDelayedHelper == null) {
+    public static EmptyMono callDelayedHelper{
+        get{
+            if (_callDelayedHelper == null){
                 _callDelayedHelper = new GameObject().AddComponent<EmptyMono>();
                 GameObject.DontDestroyOnLoad(_callDelayedHelper.gameObject);
             }
 
             return _callDelayedHelper;
         }
-        set { _callDelayedHelper = value; }
+
+        set{ _callDelayedHelper = value; }
     }
 
-    public static void Alert(string str) {
+    public static void Alert(string str){
         Debug.LogWarning(str);
     }
 
-    public static bool IsPointOverUIElement(Vector2 screenPosition) {
+    public static bool IsPointOverUIElement(Vector2 screenPosition){
         PointerEventData eventData = new PointerEventData(EventSystem.current);
         eventData.position = screenPosition;
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventData, results);
 
-        foreach (var result in results) {
-            if (result.gameObject.activeInHierarchy) {
+        foreach (var result in results){
+            if (result.gameObject.activeInHierarchy){
                 return true;
             }
         }
@@ -45,13 +46,13 @@ public static class Tools {
         return false;
     }
 
-    public static Vector2 GetMousePosOnCanvas() {
+    public static Vector2 GetMousePosOnCanvas(){
         RectTransformUtility.ScreenPointToLocalPointInRectangle(GameInfo.canvasRectTransform, Input.mousePosition, GameInfo.UICamera,
             out Vector2 pos);
         return pos;
     }
 
-    public static Vector2 GetMousePosInRect(RectTransform t) {
+    public static Vector2 GetMousePosInRect(RectTransform t){
         RectTransformUtility.ScreenPointToLocalPointInRectangle(t.parent.GetComponent<RectTransform>(), Input.mousePosition, GameInfo.UICamera,
             out Vector2 pos);
         return pos;
@@ -60,8 +61,8 @@ public static class Tools {
     /// <summary>
     /// returns a random number from lower to upper (inclusive)
     /// </summary>
-    public static int RandomNum(int lower, int upper) {
-        int GetRandomSeed() {
+    public static int RandomNum(int lower, int upper){
+        int GetRandomSeed(){
             byte[] bytes = new byte[4];
             System.Security.Cryptography.RNGCryptoServiceProvider rng = new();
             rng.GetBytes(bytes);
@@ -72,111 +73,127 @@ public static class Tools {
         //System.Random.Next returns an int from lower to upper - 1
     }
 
-    public static Vector3 GetMousePos(params string[] layers) {
+    public static Vector3 GetMousePos(params string[] layers){
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         int layer = 0;
-        foreach (string s in layers) {
-            try {
+        foreach (string s in layers){
+            try{
                 layer += (1 << LayerMask.NameToLayer(s));
-            } catch (Exception e) {
+            }
+            catch (Exception e){
                 Debug.Log(e.Message);
             }
         }
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 100000, layer)) {
+        if (Physics.Raycast(ray, out RaycastHit hit, 100000, layer)){
             return hit.point;
         }
-        else {
+        else{
             return Vector3.zero;
         }
     }
 
-    public static Vector3 ScreenToWorldPos(Vector2 pos, params string[] layers) {
+    public static Vector3 ScreenToWorldPos(Vector2 pos, params string[] layers){
         Ray ray = Camera.main.ScreenPointToRay(pos);
         int layer = 0;
-        foreach (string s in layers) {
-            try {
+        foreach (string s in layers){
+            try{
                 layer += (1 << LayerMask.NameToLayer(s));
-            } catch (Exception e) {
+            }
+            catch (Exception e){
                 Debug.Log(e.Message);
             }
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100000, layer)) {
+        if (Physics.Raycast(ray, out hit, 100000, layer)){
             return hit.point;
         }
-        else {
+        else{
             return Vector3.zero;
         }
     }
 
-    public static MonoBehaviour Create(string s) {
+    public static Vector3 GetMoujsePosOnWorldY(float givenY, Vector2 MousePosition){
+        Ray ray = GameInfo.mainCamera.ScreenPointToRay(Vector3.ClampMagnitude(MousePosition, new Vector2(Screen.width, Screen.height).magnitude));
+        if (Mathf.Abs(ray.direction.y) < 0.0001f)
+            return Vector3.zero; // 射线方向平行于平面，避免除以0
+
+        float t = (givenY - ray.origin.y) / ray.direction.y;
+        return ray.origin + ray.direction * t;
+    }
+
+    public static MonoBehaviour Create(string s){
         return MonoBehaviour.Instantiate(ResourceManager.Load<UnityEngine.MonoBehaviour>("Prefabs/" + s));
     }
 
-    public static async void CallDelayedAsync(Action a, float t, CancellationTokenSource cancel = null) {
-        try {
+    public static async void CallDelayedAsync(Action a, float t, CancellationTokenSource cancel = null){
+        try{
 #if WEBGL
             CallDelayedUnscaled(a, t);
             return;
 #else
-            if (cancel != null) {
+            if (cancel != null){
                 await Task.Delay((int)(t * 1000), cancel.Token);
             }
-            else {
+            else{
                 await Task.Delay((int)(t * 1000));
             }
 
             a.Invoke();
 #endif
-        } catch { }
+        }
+        catch{ }
     }
 
-    public static Coroutine CallDelayed(Action a, float t) {
+    public static Coroutine CallDelayed(Action a, float t){
         return callDelayedHelper.StartCoroutine(I_CallDelayed(a, t));
     }
 
-    public static Coroutine CallDelayedUnscaled(Action a, float t) {
+    public static Coroutine CallDelayedUnscaled(Action a, float t){
         return callDelayedHelper.StartCoroutine(I_CallDelayedUnscaled(a, t));
     }
 
-    private static IEnumerator I_CallDelayed(Action a, float t) {
+    private static IEnumerator I_CallDelayed(Action a, float t){
         yield return new WaitForSeconds(t);
+
         a.Invoke();
     }
 
-    private static IEnumerator I_CallDelayedUnscaled(Action a, float t) {
+    private static IEnumerator I_CallDelayedUnscaled(Action a, float t){
         yield return new WaitForSecondsRealtime(t);
+
         a.Invoke();
     }
 
-    public static IEnumerator Repeat(Action<float> action, int count, YieldInstruction interval) {
+    public static IEnumerator Repeat(Action<float> action, int count, YieldInstruction interval){
         int i = 0;
-        while (i < count) {
+        while (i < count){
             action.Invoke(i / (float)count);
             yield return interval;
+
             i++;
         }
     }
 
-    public static IEnumerator Repeat(Action<float> action, float time, YieldInstruction interval = null, Action endAction = null, bool scaled = true) {
+    public static IEnumerator Repeat(Action<float> action, float time, YieldInstruction interval = null, Action endAction = null, bool scaled = true){
         float t = 0;
-        while (t < time) {
+        while (t < time){
             action.Invoke(t / (float)time);
             yield return interval;
+
             t += scaled ? Time.deltaTime : Time.unscaledDeltaTime;
         }
 
         endAction?.Invoke();
     }
 
-    public static void SetCaller(EmptyMono m) {
+    public static void SetCaller(EmptyMono m){
         callDelayedHelper = m;
     }
 
 
-    public static string ToNormalEnglish(string codeStyleString) {
+    public static string ToNormalEnglish(string codeStyleString){
         string result = Regex.Replace(codeStyleString, "(?<!^)([A-Z])", " $1");
 
         result = char.ToUpper(result[0]) + result.Substring(1);
@@ -186,54 +203,55 @@ public static class Tools {
 }
 
 
-public class VectorHelper {
-    public static Vector3 Parse3(string s) {
+public class VectorHelper{
+    public static Vector3 Parse3(string s){
         var pos = s.Split(',');
         return new Vector3(float.Parse(pos[0][1..]), float.Parse(pos[1]), float.Parse(pos[2][..(pos[2].Length - 2)]));
     }
 
-    public static Vector2 Parse2(string s) {
+    public static Vector2 Parse2(string s){
         var pos = s.Split(',');
         return new Vector2(float.Parse(pos[0][1..]), float.Parse(pos[1][..(pos[1].Length - 2)]));
     }
 }
 
-public static class ColorFileManager {
-    public static float h(this Color c) {
+public static class ColorFileManager{
+    public static float h(this Color c){
         Color.RGBToHSV(c, out float H, out _, out _);
         return H;
     }
 
-    public static Color SetH(this Color c, float H) {
+    public static Color SetH(this Color c, float H){
         Color.RGBToHSV(c, out _, out float S, out float V);
         return Color.HSVToRGB(H, S, V);
     }
 
 
-    public static float s(this Color c) {
+    public static float s(this Color c){
         Color.RGBToHSV(c, out _, out float S, out _);
         return S;
     }
 
-    public static Color SetS(this Color c, float S) {
+    public static Color SetS(this Color c, float S){
         Color.RGBToHSV(c, out float H, out _, out float V);
         return Color.HSVToRGB(H, S, V);
     }
 
-    public static float v(this Color c) {
+    public static float v(this Color c){
         Color.RGBToHSV(c, out _, out _, out float V);
         return V;
     }
 
-    public static Color SetV(this Color c, float V) {
+    public static Color SetV(this Color c, float V){
         Color.RGBToHSV(c, out float H, out float S, out _);
         return Color.HSVToRGB(H, S, V);
     }
 }
 
-public static class TMPHelper {
-    public static void SetTextAni(this TextMeshProUGUI tmp, float start, float end, float t, string prefix = "", string postfix = "",
-        int precision = 0) {
+public static class TMPHelper{
+    public static void SetTextAni(
+        this TextMeshProUGUI tmp, float start, float end, float t, string prefix = "", string postfix = "",
+        int precision = 0){
         float delta = (end - start) / (t / Time.deltaTime);
         tmp.StartCoroutine(Tools.Repeat((_) => { tmp.text = prefix + Math.Round(start += delta, precision).ToString() + postfix; }, t,
             new WaitForEndOfFrame(), endAction: () => tmp.text = prefix + end + postfix));
@@ -243,17 +261,18 @@ public static class TMPHelper {
         //}, t + 0.1f);
     }
 
-    public static void SetTextAni(this TextMeshProUGUI tmp, float end, float t, string prefix = "", string postfix = "", int precision = 0) {
-        try {
+    public static void SetTextAni(this TextMeshProUGUI tmp, float end, float t, string prefix = "", string postfix = "", int precision = 0){
+        try{
             tmp.SetTextAni(float.Parse(tmp.text[prefix.Length..(tmp.text.Length - postfix.Length)]), end, t, prefix, postfix, precision);
-        } catch {
+        }
+        catch{
             tmp.SetTextAni(0, end, t, prefix, postfix, precision);
         }
     }
 }
 
-public static class floatHelper {
-    public static float Lerp(this float a, float b, float percent) {
+public static class floatHelper{
+    public static float Lerp(this float a, float b, float percent){
         return a + (b - a) * percent;
     }
 }

@@ -18,7 +18,7 @@ public class BookElement : CustomElement{
 
     public bool isDecal = true;
 
-    public void Awake(){
+    public override void Awake(){
         decals = GetComponentsInChildren<DecalProjector>();
         if (decals == null || decals.Length < 1){
             isDecal = false;

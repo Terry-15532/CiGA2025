@@ -15,7 +15,11 @@ Shader "Custom/URP2D/SpriteCastShadow"
         _NormalBias ("Normal Bias", Range(-1, 1)) = 0
         _ShakeStrength ("Shake Strength", Range(0, 0.5)) = 0.1
         _ShakeSpeed ("Shake Speed", Float) = 2.0
-//        _DissolvePercent ("Dissolve Percent", Range(0, 1)) = 0.0
+        [Toggle]_AffectedByDissolve ("Affected By Dissolve", Integer) = 1
+        _EdgeColor ("Edge Color", Color) = (0,0,0,0)
+        _Emission ("Emission", Float) = 1
+        _Threshold ("Threshold", Float) = 0.9
+        //        _DissolvePercent ("Dissolve Percent", Range(0, 1)) = 0.0
 
     }
     SubShader
@@ -54,6 +58,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
             SAMPLER (sampler_MainTex);
             // float _Cutoff;
             float _DissolvePercent;
+            int _AffectedByDissolve;
 
             struct Attributes
             {
@@ -80,7 +85,12 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
                 float noise = (GradientNoise(IN.uv, 5) + 0.1) / 1.1;
 
-                clip(alpha * noise - 0.01 - _DissolvePercent * 1.3);
+                if (_AffectedByDissolve){
+                    clip(alpha * noise - 0.01 - _DissolvePercent * 1.3);
+                }
+                else{
+                    clip(alpha * noise - 0.01);
+                }
 
                 return 0;
             }
@@ -125,6 +135,14 @@ Shader "Custom/URP2D/SpriteCastShadow"
             float _ShakeStrength;
             float _ShakeSpeed;
             float _DissolvePercent;
+
+            float4 _MainTex_ST;
+            float4 _EdgeColor;
+            float4 _MainTex_TexelSize;
+            float _Emission;
+            float _Threshold;
+
+            int _AffectedByDissolve;
 
 
             struct Attributes
@@ -186,7 +204,7 @@ Shader "Custom/URP2D/SpriteCastShadow"
 
                 Light light = GetAdditionalLight(0, worldPos);
                 float3 lightDir = normalize(light.direction);
-                float NdotL = saturate(5 * abs(dot(IN.normalWS, lightDir)));
+                float NdotL = 0.9 * saturate(0.3 + 3 * abs(dot(IN.normalWS, lightDir)));
                 float3 finalLight = light.color * NdotL * light.distanceAttenuation * light.shadowAttenuation;
 
 
@@ -199,13 +217,34 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 float shadow = SampleShadowmap(
                     TEXTURE2D_ARGS(_AdditionalLightsShadowmapTexture, sampler_LinearClampCompare), shadowCoord, shadowSamplingData, shadowParams, true);
 
-                _DissolvePercent *= 1.3;
+
+                if (_AffectedByDissolve){
+                    _DissolvePercent *= 1.3;
+                }
+                else{
+                    _DissolvePercent = 0;
+                }
                 float dissolveNoise = (GradientNoise(IN.uv, 5) + 0.1) / 1.1;
-                float edge = step(dissolveNoise, (_DissolvePercent-0.05)) - step(dissolveNoise, _DissolvePercent - 0.1);
+                float edge = step(dissolveNoise, (_DissolvePercent - 0.05)) - step(dissolveNoise, _DissolvePercent - 0.1);
                 clip(tex.a * dissolveNoise - _DissolvePercent + 0.1);
 
+                //Outline
+                float4 currentPixel = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                float alpha = currentPixel.a;
+
+                float2 offsets[8] = {
+                    float2(-1, 0), float2(1, 0), float2(0, -1), float2(0, 1), float2(1, 1), float2(-1, -1), float2(1, -1), float2(-1, 1)
+                };
+                for (int j = 0; j < 8; j++){
+                    float4 neighborPixel = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + offsets[j] * _MainTex_TexelSize.xy);
+                    if (abs(neighborPixel.a - alpha) > _Threshold){
+                        return float4(_EdgeColor.rgb * _Emission, 1);
+                    }
+                }
+
                 return half4(
-                    tex.rgb * _Color * noise * IN.color.r * finalLight * saturate(shadow + 0.2) * saturate(1 - edge) + (edge * 10) * float3(1, 0.05, 0.01),
+                    tex.rgb * _Color * noise * (IN.color.r + (1 - IN.color.g)) * finalLight * saturate(shadow + 0.2) * saturate(1 - edge) + (edge * 10) *
+                    float3(1, 0.05, 0.01),
                     tex.a * IN.color.a);
             }
             ENDHLSL

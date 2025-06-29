@@ -1,10 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using Unity.VisualScripting;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Hand : MonoBehaviour
 {
@@ -233,7 +227,7 @@ public class Hand : MonoBehaviour
         {
             Debug.Log("Starting outline");
             SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-            sr.sharedMaterial.SetFloat(emissionID, 2.5f);
+            sr.sharedMaterial.SetFloat(emissionID, 20f);
             sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
             sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
         }
@@ -350,3 +344,4 @@ public class Hand : MonoBehaviour
     }
 
 }
+
