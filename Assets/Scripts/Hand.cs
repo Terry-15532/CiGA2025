@@ -232,7 +232,7 @@ public class Hand : MonoBehaviour
         else if (currObj.GetComponent<SpriteChanger>() != null && currObj.GetComponent<SpriteChanger>().targetObject == obj.gameObject)
         {
             Debug.Log("Starting outline");
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
             sr.sharedMaterial.SetFloat(emissionID, 2.5f);
             sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
             sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
@@ -250,7 +250,7 @@ public class Hand : MonoBehaviour
         else if (currObj.GetComponent<SpriteChanger>() != null && currObj.GetComponent<SpriteChanger>().targetObject == obj.gameObject)
         {
             Debug.Log("Stopping outline");
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            SpriteRenderer sr = currObj.GetComponent<SpriteRenderer>();
             sr.sharedMaterial.SetFloat(emissionID, 1);
             sr.sharedMaterial.SetFloat(thresholdID, 2f);
             sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);

@@ -63,6 +63,22 @@ public class ObjectInteract : MonoBehaviour
         }
     }
 
+    private void OnMouseEnter()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sharedMaterial.SetFloat(emissionID, 2.5f);
+        sr.sharedMaterial.SetFloat(thresholdID, 0.0001f);
+        sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.yellow);
+    }
+
+    private void OnMouseExit()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sharedMaterial.SetFloat(emissionID, 1);
+        sr.sharedMaterial.SetFloat(thresholdID, 2f);
+        sr.sharedMaterial.SetColor(colorID, UnityEngine.Color.black);
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (!(playanim_disable_click && GetComponent<SpriteChanger>().aniPlayed) && other.CompareTag("Hand"))
