@@ -243,7 +243,8 @@ Shader "Custom/URP2D/SpriteCastShadow"
                 }
 
                 return half4(
-                    tex.rgb * _Color * noise * IN.color.r * finalLight * saturate(shadow + 0.2) * saturate(1 - edge) + (edge * 10) * float3(1, 0.05, 0.01),
+                    tex.rgb * _Color * noise * (IN.color.r + (1 - IN.color.g)) * finalLight * saturate(shadow + 0.2) * saturate(1 - edge) + (edge * 10) *
+                    float3(1, 0.05, 0.01),
                     tex.a * IN.color.a);
             }
             ENDHLSL
