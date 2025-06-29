@@ -37,8 +37,8 @@ public class SpriteChanger : MonoBehaviour{
 
     public Coroutine animationCoroutine;
 
-    public void CombineWith(GameObject other){
-        if (!aniPlayed && gameObject == targetObject){
+    public void OnTriggerEnter(Collider other){
+        if (!aniPlayed && other.gameObject == targetObject){
             //GetComponent<ShakeOnEnter>().StopShaking();
             aniPlayed = true;
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();

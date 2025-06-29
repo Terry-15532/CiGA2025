@@ -25,7 +25,6 @@ public class BookManager : MonoBehaviour{
             bookElement.gameObject.SetActive(false);
         }
         if (levelIndex == 1){
-            Hand.instance.canPickObjects = false;
             currInstance = this;
             levelPreview?.DecalFadeIn();
             ShowElements(3f);
@@ -33,11 +32,11 @@ public class BookManager : MonoBehaviour{
         }
     }
 
-    public void Update(){
-        if (this == currInstance && Input.GetKeyDown(KeyCode.Space)){
-            NextLevel();
-        }
-    }
+    // public void Update(){
+    //     if (this == currInstance && Input.GetKeyDown(KeyCode.Space)){
+    //         NextLevel();
+    //     }
+    // }
 
     public void ShowElements(float delay = 2.5f){
         Tools.CallDelayed(() => {
@@ -57,7 +56,6 @@ public class BookManager : MonoBehaviour{
                 bookElement.PopUp();
             }
             Tools.CallDelayed(() => {
-                Hand.instance.canPickObjects = true;
             }, 1f);
         }, delay + 2.5f);
     }
@@ -77,7 +75,6 @@ public class BookManager : MonoBehaviour{
     }
 
     public void NextLevel(){
-        Hand.instance.canPickObjects = false;
         FallDown();
         Tools.CallDelayed(() => {
             var animator = GameObject.Find("BookAndTable").GetComponent<Animator>();

@@ -1,10 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using Unity.VisualScripting;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Hand : MonoBehaviour
 {
